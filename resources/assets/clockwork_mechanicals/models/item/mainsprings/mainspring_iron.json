@@ -1,0 +1,28 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "clockwork_mechanicals:items/mainsprings/mainspring_iron"
+    },
+    "display": {
+		"thirdperson_righthand": {
+			"rotation": [ -190, 0, 55 ],
+			"translation": [ 0, 1, 0 ],
+			"scale": [ 0.15, 0.15, 0.15 ]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [ -190, 0, -40 ],
+			"translation": [ 0, 1, 0 ],
+			"scale": [ 0.15, 0.15, 0.15 ]
+		},
+		"firstperson_righthand": {
+			"rotation": [ -230, -125, 45 ],
+			"translation": [ 0, 1.65, 0 ],
+			"scale": [ 0.15, 0.15, 0.15 ]
+		},
+		"firstperson_lefthand": {
+			"rotation": [ -230, 45, -45 ],
+			"translation": [ 0, 1.65, 0 ],
+			"scale": [ 0.15, 0.15, 0.15 ]
+		}
+	}
+}

@@ -2,6 +2,7 @@ package net.rijento.clockwork_mechanicals;
 
 import java.util.Random;
 
+import net.minecraft.util.datafix.DataFixer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -9,6 +10,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.rijento.clockwork_mechanicals.lib.ClockworkDataFixesManager;
 
 @Mod(modid = ClockworkMechanicals.MOD_ID, name = ClockworkMechanicals.MOD_NAME, version = ClockworkMechanicals.VERSION, dependencies = ClockworkMechanicals.DEPENDENCIES)
 
@@ -20,7 +22,7 @@ public class ClockworkMechanicals {
 	public static final String VERSION = "@VERSION@";
 	public static final String DEPENDENCIES = "required-after:forge@[13.20.0.2228,)";
 	public static final String RESOURCE_PREFIX = MOD_ID+":";
-	
+	private final DataFixer dataFixer = ClockworkDataFixesManager.createFixer();
 	//variables
 	public static Random random = new Random();
 	

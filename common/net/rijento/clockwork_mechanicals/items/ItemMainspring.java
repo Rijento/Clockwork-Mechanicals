@@ -58,7 +58,7 @@ public class ItemMainspring extends Item
 	{
 		if (entity instanceof EntityMechanicalWorker)
 		{
-			((EntityMechanicalWorker) entity).setMainspring((ItemMainspring) itemstack.getItem());
+			((EntityMechanicalWorker) entity).setMainspring(this);
 			itemstack.setCount(0);
 			
 			return true;

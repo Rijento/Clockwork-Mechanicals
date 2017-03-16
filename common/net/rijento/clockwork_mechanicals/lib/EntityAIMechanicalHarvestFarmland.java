@@ -5,7 +5,6 @@ import net.minecraft.block.BlockCrops;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.ai.EntityAIMoveToBlock;
-import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
@@ -19,6 +18,7 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
     private final EntityMechanicalWorker theMechanical;
     private boolean hasFarmItem;
     private int currentTask;
+    public boolean completed = false;
 
     public EntityAIMechanicalHarvestFarmland(EntityMechanicalWorker theMechanicalIn, double speedIn)
     {
@@ -30,14 +30,17 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
      */
     public boolean shouldExecute()
     {
-        if (!(this.theMechanical.getTension()>0))
-    	if (this.runDelay <= 0)
+        if (this.theMechanical.getTension()-0.25F > 0)
         {
-            this.currentTask = -1;
+        	super.shouldExecute();
+        	this.currentTask = -1;
             this.hasFarmItem = this.isFarmItemInInventory();
+            return true;
         }
-
-        return super.shouldExecute();
+        else
+        {
+        	return false;
+        }
     }
 
     /**
@@ -45,6 +48,9 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
      */
     public boolean continueExecuting()
     {
+    	this.theMechanical.unwind(0.25F);
+        //this.theMechanical.tasks.removeTask(this);
+    	super.continueExecuting();
     	return false;
     }
 
@@ -115,8 +121,6 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
             }
 
             this.currentTask = -1;
-            this.runDelay = 0;
-            this.theMechanical.unwind(0.25F);
         }
     }
 
@@ -131,7 +135,6 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
         if (block == Blocks.FARMLAND)
         {
             pos = pos.up();
-            System.out.println(pos);
             IBlockState iblockstate = worldIn.getBlockState(pos);
             block = iblockstate.getBlock();
 

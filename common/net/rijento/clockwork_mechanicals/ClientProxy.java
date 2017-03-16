@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.rijento.clockwork_mechanicals.init.ModItems;
 
 public class ClientProxy extends CommonProxy {
+	
 	@Override
 	public void preInit(FMLPreInitializationEvent event){
 		

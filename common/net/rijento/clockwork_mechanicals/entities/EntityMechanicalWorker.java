@@ -29,6 +29,7 @@ public class EntityMechanicalWorker extends EntityGolem
 {
 	public List<Order> orders;
 	private ItemMainspring Mainspring;
+	private int currentTask;
 	private final InventoryBasic workerInventory;
 	private float tension;
 	private float maxTension;
@@ -104,12 +105,13 @@ public class EntityMechanicalWorker extends EntityGolem
 	public void SetOrders(List<Order> ordersIn)
 	{
 		this.tasks.taskEntries.clear();
+		this.currentTask = 0;
 		this.orders = ordersIn;
 		System.out.println(this.orders.size());
 		for (int i = 0; i < this.orders.size(); i++)
 		{
 			Order order = this.orders.get(i);
-			this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos));
+			this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 //			switch(order.command)
 //			{
 //			case "harvest":
@@ -124,6 +126,22 @@ public class EntityMechanicalWorker extends EntityGolem
 			
 		}
 	}
+	public int getCurrentTask()
+	{
+		return this.currentTask;
+	}
+	
+	public void nextTask()
+	{
+		this.currentTask = this.currentTask+1;
+		if (this.currentTask > this.orders.size() - 1)
+		{
+			this.currentTask = 0;
+		}
+		System.out.println(this.currentTask);
+	}
+	
+	
 	protected void entityInit()
     {
         super.entityInit();

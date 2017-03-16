@@ -8,6 +8,7 @@ import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 public class EntityAIMechanicalMoveToBlock extends EntityAIBase 
 {	
 	private final EntityMechanicalWorker theMechanical;
+	private final int priority;
 	protected boolean isAboveDestination;
 	protected int runDelay;
 	private final double movementSpeed;
@@ -15,9 +16,10 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
     private int timeoutCounter;
     private int maxStayTicks;
     
-	public EntityAIMechanicalMoveToBlock(EntityMechanicalWorker theMechanicalIn, double speedIn, BlockPos pos)
+	public EntityAIMechanicalMoveToBlock(EntityMechanicalWorker theMechanicalIn, double speedIn, BlockPos pos, int priorityIn)
 	{
 		this.destinationBlock = pos;
+		this.priority = priorityIn;
 		this.movementSpeed = speedIn;
 		this.theMechanical = theMechanicalIn;
 		this.startExecuting();
@@ -25,18 +27,22 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 	
 	public boolean shouldExecute()
     {
-		if (this.runDelay > 0)
-        {
-            --this.runDelay;
+		if (this.priority != this.theMechanical.getCurrentTask())
+		{
             return false;
         }
+		if (this.runDelay > 0)
+		{
+			--this.runDelay;
+			return false;
+		}
 //        if (!(this.theMechanical.getTension()-0.1F>0))
 //        {
 //            return false;
 //        }
         else
         {
-        	this.runDelay = 15 * this.theMechanical.orders.size();
+        	this.runDelay = 20;
         	return true;
         }
     }
@@ -57,27 +63,30 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 	
 	public void startExecuting()
     {
-        this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()) + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()) + 0.5D, this.movementSpeed);
+        this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
         this.timeoutCounter = 0;
         this.maxStayTicks = 100;
+        this.runDelay = 20;
     }
 	
 	public void updateTask()
     {
-        if (this.theMechanical.getDistanceSqToCenter(this.destinationBlock.up()) > 0.1D)
+        if (this.theMechanical.getDistanceSqToCenter(this.destinationBlock.up()) > 0.5D)
         {
             this.isAboveDestination = false;
             ++this.timeoutCounter;
 
-            if (this.timeoutCounter % 40 == 0)
+            if (this.timeoutCounter % 10 == 0)
             {
-                this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()) + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()) + 0.5D, this.movementSpeed);
+                this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
             }
         }
         else
         {
             this.isAboveDestination = true;
-            --this.timeoutCounter;
+            this.theMechanical.nextTask();
+            this.timeoutCounter = 0;
+            
         }
     }
 	

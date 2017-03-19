@@ -30,7 +30,7 @@ import net.rijento.clockwork_mechanicals.lib.Order;
 public class EntityMechanicalWorker extends EntityGolem 
 {
 	public List<Order> orders;
-	public boolean isWinding= false;
+	public boolean isWinding = false;
 	private ItemMainspring Mainspring;
 	private int currentTask;
 	private final InventoryBasic workerInventory;
@@ -47,9 +47,6 @@ public class EntityMechanicalWorker extends EntityGolem
 	protected boolean isAIEnabled()
 	{
 	   return true;
-	}
-	protected void InitEntityAI()
-	{
 	}
 	
 	@Override
@@ -124,12 +121,6 @@ public class EntityMechanicalWorker extends EntityGolem
 			this.currentTask = 0;
 		}
 	}
-	
-	
-	protected void entityInit()
-    {
-        super.entityInit();
-    }
 	
 	public static void registerFixesWorker(DataFixer fixer)
     {

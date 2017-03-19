@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.ai.EntityAIMoveToBlock;
+import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
@@ -13,43 +13,44 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 
-public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
+public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
 {
     private final EntityMechanicalWorker theMechanical;
     private boolean hasFarmItem;
+    /** Used to determine what the mechanical does: -1 = nothing, 0 = harvest crop, 1 = plant crop */
     private int currentTask;
-    public boolean completed = false;
+    /** The "priority" of the task, only executes if the entity's current task matches this number. */
+    private final int priority;
 
-    public EntityAIMechanicalHarvestFarmland(EntityMechanicalWorker theMechanicalIn, double speedIn)
+    public EntityAIMechanicalHarvestFarmland(EntityMechanicalWorker theMechanicalIn, int priorityIn)
     {
-        super(theMechanicalIn, speedIn, 0);
         this.theMechanical = theMechanicalIn;
+        this.priority = priorityIn;
     }
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
     public boolean shouldExecute()
     {
-        if (this.theMechanical.getTension()-0.25F > 0)
-        {
-        	super.shouldExecute();
-        	this.currentTask = -1;
-            this.hasFarmItem = this.isFarmItemInInventory();
-            return true;
-        }
-        else
-        {
-        	return false;
-        }
-    }
+    	if (this.priority != this.theMechanical.getCurrentTask())
+    	{
+    		return false;
+    	}
+    	else if (this.theMechanical.getTension()-0.25F < 0)
+    	{
+    		return false;
+    	}
+    	this.currentTask = -1;
+    	this.determineTask(this.theMechanical.getEntityWorld());
+        this.hasFarmItem = this.isFarmItemInInventory();
+        return true;
+	}
 
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
     public boolean continueExecuting()
     {
-    	this.theMechanical.unwind(0.25F);
-        //this.theMechanical.tasks.removeTask(this);
     	super.continueExecuting();
     	return false;
     }
@@ -59,79 +60,73 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
      */
     public void updateTask()
     {
-        super.updateTask();
-        this.theMechanical.getLookHelper().setLookPosition((double)this.destinationBlock.getX() + 0.5D, (double)(this.destinationBlock.getY() + 1), (double)this.destinationBlock.getZ() + 0.5D, 10.0F, (float)this.theMechanical.getVerticalFaceSpeed());
+        World world = this.theMechanical.world;
+        BlockPos blockpos = this.theMechanical.getPosition();
+        IBlockState iblockstate = world.getBlockState(blockpos);
+        Block block = iblockstate.getBlock();
 
-        if (this.getIsAboveDestination())
+        if (this.currentTask == 0 && block instanceof BlockCrops && ((BlockCrops)block).isMaxAge(iblockstate))
         {
-            World world = this.theMechanical.world;
-            BlockPos blockpos = this.theMechanical.getPosition();
-            IBlockState iblockstate = world.getBlockState(blockpos);
-            Block block = iblockstate.getBlock();
+            world.destroyBlock(blockpos, true);
+            this.theMechanical.unwind(0.25F);
+        }
+        else if (this.currentTask == 1 && iblockstate.getMaterial() == Material.AIR)
+        {
+            InventoryBasic inventorybasic = this.theMechanical.getMechanicalInventory();
 
-            if (this.currentTask == 0 && block instanceof BlockCrops && ((BlockCrops)block).isMaxAge(iblockstate))
+            for (int i = 0; i < inventorybasic.getSizeInventory(); ++i)
             {
-                world.destroyBlock(blockpos, true);
-            }
-            else if (this.currentTask == 1 && iblockstate.getMaterial() == Material.AIR)
-            {
-                InventoryBasic inventorybasic = this.theMechanical.getMechanicalInventory();
+                ItemStack itemstack = inventorybasic.getStackInSlot(i);
+                boolean flag = false;
 
-                for (int i = 0; i < inventorybasic.getSizeInventory(); ++i)
+                if (!itemstack.isEmpty())
                 {
-                    ItemStack itemstack = inventorybasic.getStackInSlot(i);
-                    boolean flag = false;
-
-                    if (!itemstack.isEmpty())
+                    if (itemstack.getItem() == Items.WHEAT_SEEDS)
                     {
-                        if (itemstack.getItem() == Items.WHEAT_SEEDS)
-                        {
-                            world.setBlockState(blockpos, Blocks.WHEAT.getDefaultState(), 3);
-                            flag = true;
-                        }
-                        else if (itemstack.getItem() == Items.POTATO)
-                        {
-                            world.setBlockState(blockpos, Blocks.POTATOES.getDefaultState(), 3);
-                            flag = true;
-                        }
-                        else if (itemstack.getItem() == Items.CARROT)
-                        {
-                            world.setBlockState(blockpos, Blocks.CARROTS.getDefaultState(), 3);
-                            flag = true;
-                        }
-                        else if (itemstack.getItem() == Items.BEETROOT_SEEDS)
-                        {
-                            world.setBlockState(blockpos, Blocks.BEETROOTS.getDefaultState(), 3);
-                            flag = true;
-                        }
+                        world.setBlockState(blockpos, Blocks.WHEAT.getDefaultState(), 3);
+                        this.theMechanical.unwind(0.25F);
+                        flag = true;
                     }
-
-                    if (flag)
+                    else if (itemstack.getItem() == Items.POTATO)
                     {
-                        itemstack.shrink(1);
-
-                        if (itemstack.isEmpty())
-                        {
-                            inventorybasic.setInventorySlotContents(i, ItemStack.EMPTY);
-                        }
-
-                        break;
+                        world.setBlockState(blockpos, Blocks.POTATOES.getDefaultState(), 3);
+                        this.theMechanical.unwind(0.25F);
+                        flag = true;
+                    }
+                    else if (itemstack.getItem() == Items.CARROT)
+                    {
+                        world.setBlockState(blockpos, Blocks.CARROTS.getDefaultState(), 3);
+                        this.theMechanical.unwind(0.25F);
+                        flag = true;
+                    }
+                    else if (itemstack.getItem() == Items.BEETROOT_SEEDS)
+                    {
+                        world.setBlockState(blockpos, Blocks.BEETROOTS.getDefaultState(), 3);
+                        this.theMechanical.unwind(0.25F);
+                        flag = true;
                     }
                 }
+
+                if (flag)
+                {
+                    itemstack.shrink(1);
+
+                    if (itemstack.isEmpty())
+                    {
+                        inventorybasic.setInventorySlotContents(i, ItemStack.EMPTY);
+                    }
+
+                    break;
+                }
             }
-
-            this.currentTask = -1;
         }
+        this.currentTask = -1;
     }
-
-    /**
-     * Return true to set given position as destination
-     */
-    protected boolean shouldMoveTo(World worldIn, BlockPos pos)
+    
+    protected void determineTask(World worldIn)
     {
-    	pos = this.theMechanical.getPosition().down(1);
+    	BlockPos pos = this.theMechanical.getPosition().down(1);
     	Block block = worldIn.getBlockState(pos).getBlock();
-        System.out.println(this.currentTask);
         if (block == Blocks.FARMLAND)
         {
             pos = pos.up();
@@ -141,17 +136,13 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIMoveToBlock
             if (block instanceof BlockCrops && ((BlockCrops)block).isMaxAge(iblockstate) &&  (this.currentTask == 0 || this.currentTask < 0))
             {
                 this.currentTask = 0;
-                return true;
             }
 
             if (iblockstate.getMaterial() == Material.AIR && this.hasFarmItem && (this.currentTask == 1 || this.currentTask < 0))
             {
             	this.currentTask = 1;
-                return true;
             }
         }
-
-        return false;
     }
     public boolean isFarmItemInInventory()
     {

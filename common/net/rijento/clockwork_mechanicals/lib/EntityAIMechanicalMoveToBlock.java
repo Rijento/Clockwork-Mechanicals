@@ -14,7 +14,6 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 	private final double movementSpeed;
 	protected BlockPos destinationBlock;
     private int timeoutCounter;
-    private int maxStayTicks;
     
 	public EntityAIMechanicalMoveToBlock(EntityMechanicalWorker theMechanicalIn, double speedIn, BlockPos pos, int priorityIn)
 	{
@@ -36,10 +35,10 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 			--this.runDelay;
 			return false;
 		}
-//        if (!(this.theMechanical.getTension()-0.1F>0))
-//        {
-//            return false;
-//        }
+        if (!(this.theMechanical.getTension()-0.1F>0))
+        {
+            return false;
+        }
         else
         {
         	this.runDelay = 20;
@@ -57,7 +56,6 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 		else
 		{
 			return true;
-//			return this.timeoutCounter >= -this.maxStayTicks;
 		}
     }
 	
@@ -65,7 +63,6 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
     {
         this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
         this.timeoutCounter = 0;
-        this.maxStayTicks = 100;
         this.runDelay = 20;
     }
 	

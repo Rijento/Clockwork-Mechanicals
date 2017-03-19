@@ -21,13 +21,14 @@ import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
+import net.rijento.clockwork_mechanicals.lib.EntityAIMechanicalHarvestFarmland;
 import net.rijento.clockwork_mechanicals.lib.EntityAIMechanicalMoveToBlock;
-import net.rijento.clockwork_mechanicals.lib.EntityAIMechanicalWait;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
 public class EntityMechanicalWorker extends EntityGolem 
 {
 	public List<Order> orders;
+	public boolean movementDecremented = false;
 	private ItemMainspring Mainspring;
 	private int currentTask;
 	private final InventoryBasic workerInventory;
@@ -40,41 +41,29 @@ public class EntityMechanicalWorker extends EntityGolem
 		this.setSize(0.6F, 0.95F);
 		this.maxTension = 0F;
 		this.setCanPickUpLoot(true);
-//		this.InitEntityAI();
-		
 	}
-	
-	@Override
 	protected boolean isAIEnabled()
 	{
 	   return true;
 	}
-	@Override
-	public void setMoveForward(float amount)
-    {
-		this.unwind(0.1F);
-        super.setMoveForward(amount);
-    }
-	@Override
-	public void setMoveStrafing(float amount)
-    {
-		this.unwind(0.15F);
-        super.setMoveStrafing(amount);
-    }
-	
 	protected void InitEntityAI()
 	{
 	}
 	
 	@Override
-	protected void updateAITasks()
+	public void onUpdate()
 	{
+		double d0 = this.posX - this.prevPosX;
+        double d1 = this.posZ - this.prevPosZ;
+        double f1 = d0 * d0 + d1 * d1;
+        float distance = (float)Math.sqrt(f1);
+        if (distance > 0.0F){this.unwind(0.1F * distance);}
+		super.onUpdate();
 	}
 	
 	protected void updateEquipmentIfNeeded(EntityItem itemEntity)
     {
         ItemStack itemstack = itemEntity.getEntityItem();
-        Item item = itemstack.getItem();    
         ItemStack itemstack1 = this.workerInventory.addItem(itemstack);
 
         if (itemstack1.isEmpty())
@@ -102,34 +91,25 @@ public class EntityMechanicalWorker extends EntityGolem
 		this.maxTension = MainspringIn.getMaxTension();
 		this.setAIMoveSpeed(0.25F * MainspringIn.getResistance());
 	}
+	
 	public void SetOrders(List<Order> ordersIn)
 	{
 		this.tasks.taskEntries.clear();
 		this.currentTask = 0;
 		this.orders = ordersIn;
-		System.out.println(this.orders.size());
 		for (int i = 0; i < this.orders.size(); i++)
 		{
 			Order order = this.orders.get(i);
 			this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
-//			switch(order.command)
-//			{
-//			case "harvest":
-//				System.out.println("before4");
-//				EntityAIMechanicalHarvestFarmland task = new EntityAIMechanicalHarvestFarmland(this, 0.25F);
-//				System.out.println("before5");
-//				this.tasks.addTask(1, task);
-//				System.out.println("after2");
-//				
-//			}
-			
-			
+			switch(order.command)
+			{
+			case "harvest":
+				EntityAIMechanicalHarvestFarmland task = new EntityAIMechanicalHarvestFarmland(this, i);
+				this.tasks.addTask(i, task);
+			}
 		}
 	}
-	public int getCurrentTask()
-	{
-		return this.currentTask;
-	}
+	public int getCurrentTask(){return this.currentTask;}
 	
 	public void nextTask()
 	{
@@ -138,7 +118,6 @@ public class EntityMechanicalWorker extends EntityGolem
 		{
 			this.currentTask = 0;
 		}
-		System.out.println(this.currentTask);
 	}
 	
 	
@@ -172,7 +151,6 @@ public class EntityMechanicalWorker extends EntityGolem
                 nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
             }
         }
-
         compound.setTag("Inventory", nbttaglist);
     }
 
@@ -184,7 +162,6 @@ public class EntityMechanicalWorker extends EntityGolem
         Item MainIn = mainspringStack.getItem();
         if (MainIn instanceof ItemMainspring)
         {
-        	System.out.println("WORK");
         	this.setMainspring((ItemMainspring)MainIn);
         }
         this.tension = compound.getFloat("Tension");
@@ -253,5 +230,4 @@ public class EntityMechanicalWorker extends EntityGolem
 			this.dropItem(this.Mainspring, 1);
 		}
 	}
-
 }

@@ -28,12 +28,13 @@ public class EntityAIMechanicalWait extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-    	if (this.priority == this.idleEntity.getCurrentTask())
+    	if (this.idleEntity.isWinding == true){return false;}
+    	else if (this.priority == this.idleEntity.getCurrentTask())
     	{
     		this.idleTime = this.idleTimeBase;
     		return true;
     	}
-    	return false;
+    	else{return false;}
     }
 
     /**

@@ -57,7 +57,6 @@ public class ItemMechanicalConfigurator extends Item
 		}
 		NBTTagCompound toAdd = (new Order(pos,command)).getOrderNBT();
 		stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).appendTag(toAdd);
-		System.out.println("test: "+stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).tagCount());
 	}
 	public List<Order> getOrders(ItemStack stack)
 	{

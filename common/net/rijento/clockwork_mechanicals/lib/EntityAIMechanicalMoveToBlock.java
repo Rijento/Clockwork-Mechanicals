@@ -21,24 +21,18 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 		this.priority = priorityIn;
 		this.movementSpeed = speedIn;
 		this.theMechanical = theMechanicalIn;
-		this.startExecuting();
 	}
 	
 	public boolean shouldExecute()
     {
-		if (this.priority != this.theMechanical.getCurrentTask())
-		{
-            return false;
-        }
-		if (this.runDelay > 0)
+		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+		else if (!(this.theMechanical.getTension()-0.1F>0)){return false;}
+		else if (this.theMechanical.isWinding == true){return false;}
+		else if (this.runDelay > 0)
 		{
 			--this.runDelay;
 			return false;
 		}
-        if (!(this.theMechanical.getTension()-0.1F>0))
-        {
-            return false;
-        }
         else
         {
         	this.runDelay = 20;

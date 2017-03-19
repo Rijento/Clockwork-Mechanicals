@@ -28,7 +28,7 @@ import net.rijento.clockwork_mechanicals.lib.Order;
 public class EntityMechanicalWorker extends EntityGolem 
 {
 	public List<Order> orders;
-	public boolean movementDecremented = false;
+	public boolean isWinding= false;
 	private ItemMainspring Mainspring;
 	private int currentTask;
 	private final InventoryBasic workerInventory;
@@ -200,9 +200,11 @@ public class EntityMechanicalWorker extends EntityGolem
 			if (this.tension + rate/this.Mainspring.getWindingCost() <= this.maxTension)
 			{
 				this.tension += (rate/this.Mainspring.getWindingCost());
+				this.isWinding = true;
 				System.out.print(this.tension);
 			}
 		}
+		this.isWinding = false;
 	}
 	public void unwind(float amount)
 	{

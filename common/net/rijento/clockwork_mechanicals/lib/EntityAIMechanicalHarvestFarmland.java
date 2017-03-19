@@ -32,18 +32,16 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-    	if (this.priority != this.theMechanical.getCurrentTask())
+    	if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+    	else if (this.theMechanical.isWinding == true){return false;}
+    	else if (this.theMechanical.getTension()-0.25F < 0){return false;}
+    	else
     	{
-    		return false;
+	    	this.currentTask = -1;
+	    	this.determineTask(this.theMechanical.getEntityWorld());
+	        this.hasFarmItem = this.isFarmItemInInventory();
+	        return true;
     	}
-    	else if (this.theMechanical.getTension()-0.25F < 0)
-    	{
-    		return false;
-    	}
-    	this.currentTask = -1;
-    	this.determineTask(this.theMechanical.getEntityWorld());
-        this.hasFarmItem = this.isFarmItemInInventory();
-        return true;
 	}
 
     /**

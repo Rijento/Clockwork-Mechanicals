@@ -21,6 +21,7 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 		this.priority = priorityIn;
 		this.movementSpeed = speedIn;
 		this.theMechanical = theMechanicalIn;
+		this.runDelay = 20;
 	}
 	
 	public boolean shouldExecute()

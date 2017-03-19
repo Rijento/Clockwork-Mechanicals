@@ -34,7 +34,7 @@ public class ItemMechanicalConfigurator extends Item
 	{
 		if (entity instanceof EntityMechanicalWorker && player.isSneaking())
 		{
-			((EntityMechanicalWorker) entity).SetOrders(getOrders(itemstack));
+			((EntityMechanicalWorker) entity).SetOrders(getOrders(itemstack),false);
 			return true;
 		}
 		return false;
@@ -51,7 +51,6 @@ public class ItemMechanicalConfigurator extends Item
 	{
 		if (!stack.hasTagCompound())
 		{
-			System.out.println("NO");
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
 		}

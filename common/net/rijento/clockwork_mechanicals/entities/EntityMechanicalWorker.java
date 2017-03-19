@@ -1,5 +1,6 @@
 package net.rijento.clockwork_mechanicals.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -20,6 +21,7 @@ import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.EntityAIMechanicalHarvestFarmland;
 import net.rijento.clockwork_mechanicals.lib.EntityAIMechanicalMoveToBlock;
@@ -92,10 +94,13 @@ public class EntityMechanicalWorker extends EntityGolem
 		this.setAIMoveSpeed(0.25F * MainspringIn.getResistance());
 	}
 	
-	public void SetOrders(List<Order> ordersIn)
+	public void SetOrders(List<Order> ordersIn, boolean load)
 	{
-		this.tasks.taskEntries.clear();
-		this.currentTask = 0;
+		if (load == false)
+		{
+			this.tasks.taskEntries.clear();
+			this.currentTask = 0;
+		}
 		this.orders = ordersIn;
 		for (int i = 0; i < this.orders.size(); i++)
 		{
@@ -138,6 +143,7 @@ public class EntityMechanicalWorker extends EntityGolem
         super.writeEntityToNBT(compound);
         compound.setTag("Mainspring", new ItemStack(this.Mainspring).writeToNBT(new NBTTagCompound()));
         compound.setFloat("Tension", this.tension);
+        compound.setInteger("currentTask", this.currentTask);
         
         
         NBTTagList nbttaglist = new NBTTagList();
@@ -152,6 +158,14 @@ public class EntityMechanicalWorker extends EntityGolem
             }
         }
         compound.setTag("Inventory", nbttaglist);
+        
+        NBTTagList nbttaglist2 = new NBTTagList();
+        for (Order order : this.orders)
+        {
+        	nbttaglist2.appendTag(order.getOrderNBT());
+        }
+        compound.setTag("Orders", nbttaglist2);
+        
     }
 
 	@Override
@@ -165,8 +179,9 @@ public class EntityMechanicalWorker extends EntityGolem
         	this.setMainspring((ItemMainspring)MainIn);
         }
         this.tension = compound.getFloat("Tension");
+        this.currentTask = compound.getInteger("currentTask");
         
-        NBTTagList nbttaglist = compound.getTagList("Inventory", 10);
+        NBTTagList nbttaglist = compound.getTagList("Inventory", Constants.NBT.TAG_COMPOUND);
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
@@ -177,6 +192,14 @@ public class EntityMechanicalWorker extends EntityGolem
                 this.workerInventory.addItem(itemstack);
             }
         }
+        NBTTagList nbttaglist2 = compound.getTagList("Orders", Constants.NBT.TAG_COMPOUND);
+        this.orders = new ArrayList<Order>();
+        for (int i = 0; i < nbttaglist2.tagCount(); ++i)
+        {
+        	Order toAdd = new Order(nbttaglist2.getCompoundTagAt(i));
+        	this.orders.add(toAdd);
+        }
+        this.SetOrders(this.orders, true);
     }
 	
     @Nullable

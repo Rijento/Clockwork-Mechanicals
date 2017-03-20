@@ -22,7 +22,6 @@ import net.minecraftforge.client.model.obj.OBJModel;
 public class ConfiguratorRenderingUtils implements IResourceManagerReloadListener 
 {
 	public static Map<IBlockState, List<BakedQuad>> quads = new HashMap<IBlockState, List<BakedQuad>>();
-	public static Map<ResourceLocation, IBakedModel> models = new HashMap<ResourceLocation, IBakedModel>();
 	
 	public static List<BakedQuad> getQuad(IBlockState state)
 	{
@@ -50,30 +49,9 @@ public class ConfiguratorRenderingUtils implements IResourceManagerReloadListene
 		}
 		return new ArrayList<BakedQuad>();
 	}
-	
-	public static void renderQuad(List<BakedQuad> quadList)
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-		VertexBuffer vertexBuffer = tessellator.getBuffer();
-		
-		
-		for (BakedQuad quad : quadList)
-		{
-			vertexBuffer.begin(7, DefaultVertexFormats.ITEM);
-			vertexBuffer.addVertexData(quad.getVertexData());
-			vertexBuffer.putColor4(0xFF000000);
-			Vec3i vec3i = quad.getFace().getDirectionVec();
-			vertexBuffer.putNormal((float) vec3i.getX(), (float) vec3i.getY(), (float) vec3i.getZ());
-			tessellator.draw();
-		}
-		
-	}
-	
-	
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager) 
 	{
 		quads.clear();
-		models.clear();
 	}
 }

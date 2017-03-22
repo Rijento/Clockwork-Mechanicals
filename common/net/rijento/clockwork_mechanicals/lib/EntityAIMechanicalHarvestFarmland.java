@@ -35,6 +35,7 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
     	if (this.priority != this.theMechanical.getCurrentTask()){return false;}
     	else if (this.theMechanical.isWinding == true){return false;}
     	else if (this.theMechanical.getTension()-0.25F < 0){return false;}
+    	else if (this.theMechanical.isWet()){return false;}
     	else
     	{
 	    	this.currentTask = -1;

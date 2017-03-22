@@ -29,6 +29,7 @@ public class EntityAIMechanicalWait extends EntityAIBase
     public boolean shouldExecute()
     {
     	if (this.idleEntity.isWinding == true){return false;}
+    	else if (this.idleEntity.isWet()){return false;}
     	else if (this.priority == this.idleEntity.getCurrentTask())
     	{
     		this.idleTime = this.idleTimeBase;

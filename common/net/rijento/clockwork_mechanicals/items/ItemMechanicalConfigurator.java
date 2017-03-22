@@ -3,15 +3,7 @@ package net.rijento.clockwork_mechanicals.items;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.entity.Entity;
+import net.minecraft.block.BlockCrops;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -21,19 +13,14 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
-import net.rijento.clockwork_mechanicals.lib.ConfiguratorRenderingUtils;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
 public class ItemMechanicalConfigurator extends Item
 {
-	
 	public ItemMechanicalConfigurator()
 	{
 		this.setMaxStackSize(1);
@@ -52,19 +39,48 @@ public class ItemMechanicalConfigurator extends Item
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
 		ItemStack stack = player.getHeldItem(hand);
+		if (worldIn.getBlockState(pos).getBlock() instanceof BlockCrops)
+		{
+			if (player.isSneaking())
+			{
+				removeOrder(pos.down(), "harvest", stack);
+				return EnumActionResult.SUCCESS;
+			}
+			addOrder(pos.down(),"harvest",stack);
+			return EnumActionResult.SUCCESS;
+		}
+		if (player.isSneaking())
+		{
+			removeOrder(pos,"harvest",stack);
+	        return EnumActionResult.SUCCESS;
+		}
 		addOrder(pos,"harvest",stack);
         return EnumActionResult.SUCCESS;
     }
 	
 	public void addOrder(BlockPos pos, String command, ItemStack stack)
 	{
+		List<Order> orders = this.getOrders(stack);
 		if (!stack.hasTagCompound())
 		{
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
 		}
-		NBTTagCompound toAdd = (new Order(pos,command)).getOrderNBT();
-		stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).appendTag(toAdd);
+		Order toAdd = new Order(pos,command);
+		NBTTagCompound toAddNBT = toAdd.getOrderNBT();
+		if (!orders.contains(toAdd))
+		{
+			stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).appendTag(toAddNBT);
+		}
+	}
+	public void removeOrder(BlockPos pos, String command, ItemStack stack)
+	{
+		List<Order> orders = this.getOrders(stack);
+		if(!orders.isEmpty())
+		{
+			Order toRemove = new Order(pos, command);
+			stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).removeTag((orders.indexOf(toRemove)));
+		}
 	}
 	public List<Order> getOrders(ItemStack stack)
 	{

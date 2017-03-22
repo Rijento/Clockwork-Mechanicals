@@ -34,4 +34,19 @@ public class Order
 		this.pos = new BlockPos(orderNBT.getInteger("x"),orderNBT.getInteger("y"),orderNBT.getInteger("z"));
 		this.command = orderNBT.getString("Command");
 	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == null) {return false;}
+	    if (!Order.class.isAssignableFrom(obj.getClass())){return false;}
+	    final Order other = (Order) obj;
+	    if ((this.pos == null) ? (other.pos != null) : !this.pos.equals(other.pos)){return false;}
+	    return true;
+	}
+	@Override
+	public int hashCode() {
+	    int hash = 3;
+	    hash = 66 * hash + (this.pos != null ? this.pos.hashCode() : 0);
+	    return hash;
+	}
 }

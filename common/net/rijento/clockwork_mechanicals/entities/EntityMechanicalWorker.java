@@ -22,9 +22,9 @@ import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalHarvestFarmland;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
-import net.rijento.clockwork_mechanicals.lib.EntityAIMechanicalHarvestFarmland;
-import net.rijento.clockwork_mechanicals.lib.EntityAIMechanicalMoveToBlock;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
 public class EntityMechanicalWorker extends EntityGolem 

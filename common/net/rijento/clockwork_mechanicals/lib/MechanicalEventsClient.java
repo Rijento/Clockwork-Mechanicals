@@ -80,7 +80,7 @@ public class MechanicalEventsClient
                 
                 switch (command)
                 {
-                case("transport"):
+                case("dropoff"):
 	                GlStateManager.pushMatrix();
 	                GlStateManager.depthFunc(515);
 	                GlStateManager.enableRescaleNormal();
@@ -90,11 +90,29 @@ public class MechanicalEventsClient
 	            	GlStateManager.scale(0.6F, -0.6F, -0.6F);
 	            	//GlStateManager.rotate(90.0f, 0.0f, 1.0f, 0.0f);
 	            	GlStateManager.translate(0.34, 0.35, 0.35);
-	            	ModelChest chest = new ModelChest();
-	            	chest.renderAll();
+	            	ModelChest chestClosed = new ModelChest();
+	            	chestClosed.renderAll();
 	            	GlStateManager.disableRescaleNormal();
 	            	Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 	            	GlStateManager.popMatrix();
+	            	continue;
+                case("pickup"):
+	                GlStateManager.pushMatrix();
+	                GlStateManager.depthFunc(515);
+	                GlStateManager.enableRescaleNormal();
+	                GlStateManager.depthMask(true);
+	            	Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("textures/entity/chest/normal.png"));
+	            	GlStateManager.translate(renderX, renderY+1, renderZ+1);
+	            	GlStateManager.scale(0.6F, -0.6F, -0.6F);
+	            	//GlStateManager.rotate(90.0f, 0.0f, 1.0f, 0.0f);
+	            	GlStateManager.translate(0.34, 0.35, 0.35);
+	            	ModelChest chestOpen = new ModelChest();
+	            	chestOpen.chestLid.rotateAngleX = -(45 * ((float)Math.PI / 2F));
+	            	chestOpen.renderAll();
+	            	GlStateManager.disableRescaleNormal();
+	            	Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+	            	GlStateManager.popMatrix();
+	            	continue;
                 case("harvest"):
 	            	TextureAtlasSprite spriteDown = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/dirt");
 	            	TextureAtlasSprite spriteEast = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/dirt");
@@ -151,6 +169,7 @@ public class MechanicalEventsClient
 	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).tex(spriteDown.getInterpolatedU(16), spriteDown.getInterpolatedV(0)).endVertex();
 	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spriteDown.getInterpolatedU(16), spriteDown.getInterpolatedV(16)).endVertex();
 	                tessellator.draw();
+	                continue;
                 }
             }
 		}

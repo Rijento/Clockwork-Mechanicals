@@ -54,7 +54,7 @@ public class ItemMechanicalConfigurator extends Item
 			removeOrder(pos,"harvest",stack);
 	        return EnumActionResult.SUCCESS;
 		}
-		addOrder(pos,"harvest",stack);
+		addOrder(pos,"dropoff",stack);
         return EnumActionResult.SUCCESS;
     }
 	

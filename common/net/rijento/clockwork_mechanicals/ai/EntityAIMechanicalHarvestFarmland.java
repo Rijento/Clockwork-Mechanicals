@@ -1,4 +1,4 @@
-package net.rijento.clockwork_mechanicals.lib;
+package net.rijento.clockwork_mechanicals.ai;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;

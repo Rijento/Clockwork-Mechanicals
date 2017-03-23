@@ -8,6 +8,8 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.item.ItemSeedFood;
+import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -80,27 +82,15 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
 
                 if (!itemstack.isEmpty())
                 {
-                    if (itemstack.getItem() == Items.WHEAT_SEEDS)
+                    if (itemstack.getItem() instanceof ItemSeeds)
                     {
-                        world.setBlockState(blockpos, Blocks.WHEAT.getDefaultState(), 3);
+                        world.setBlockState(blockpos, ((ItemSeeds)itemstack.getItem()).getPlant(world, blockpos), 3);
                         this.theMechanical.unwind(0.25F);
                         flag = true;
                     }
-                    else if (itemstack.getItem() == Items.POTATO)
+                    else if (itemstack.getItem() instanceof ItemSeedFood)
                     {
-                        world.setBlockState(blockpos, Blocks.POTATOES.getDefaultState(), 3);
-                        this.theMechanical.unwind(0.25F);
-                        flag = true;
-                    }
-                    else if (itemstack.getItem() == Items.CARROT)
-                    {
-                        world.setBlockState(blockpos, Blocks.CARROTS.getDefaultState(), 3);
-                        this.theMechanical.unwind(0.25F);
-                        flag = true;
-                    }
-                    else if (itemstack.getItem() == Items.BEETROOT_SEEDS)
-                    {
-                        world.setBlockState(blockpos, Blocks.BEETROOTS.getDefaultState(), 3);
+                        world.setBlockState(blockpos, ((ItemSeedFood)itemstack.getItem()).getPlant(world, blockpos), 3);
                         this.theMechanical.unwind(0.25F);
                         flag = true;
                     }

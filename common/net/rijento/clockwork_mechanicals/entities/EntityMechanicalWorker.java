@@ -22,6 +22,7 @@ import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalDropOff;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalHarvestFarmland;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
@@ -56,7 +57,7 @@ public class EntityMechanicalWorker extends EntityGolem
         double d1 = this.posZ - this.prevPosZ;
         double f1 = d0 * d0 + d1 * d1;
         float distance = (float)Math.sqrt(f1);
-        if (distance > 0.0F){this.unwind(0.1F * distance);}
+        if (distance > 0.0F){this.unwind(0.5F * distance);}
 		super.onUpdate();
 	}
 	
@@ -106,8 +107,11 @@ public class EntityMechanicalWorker extends EntityGolem
 			switch(order.command)
 			{
 			case "harvest":
-				EntityAIMechanicalHarvestFarmland task = new EntityAIMechanicalHarvestFarmland(this, i);
-				this.tasks.addTask(i, task);
+				EntityAIMechanicalHarvestFarmland taskHarvest = new EntityAIMechanicalHarvestFarmland(this, i);
+				this.tasks.addTask(i, taskHarvest);
+			case "dropoff":
+				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i);
+				this.tasks.addTask(i, taskDropoff);
 			}
 		}
 	}

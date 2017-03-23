@@ -13,6 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.items.ItemMechanicalConfigurator;
+import net.rijento.clockwork_mechanicals.items.ItemWaypointCompass;
 import net.rijento.clockwork_mechanicals.items.ItemWindingKey;
 
 public class ModItems
@@ -22,12 +23,14 @@ public class ModItems
 	public static final ItemMainspring mainspring = new ItemMainspring();
 	public static final ItemWindingKey winding_key = new ItemWindingKey();
 	public static final ItemMechanicalConfigurator mechanical_configurator = new ItemMechanicalConfigurator();
+	public static final ItemWaypointCompass waypoint_compass = new ItemWaypointCompass();
 	
 	public static void preInit()
 	{
 		registerItem("ItemMainspring", mainspring);
 		registerItem("ItemWindingKey", winding_key);
 		registerItem("ItemMechanicalConfigurator", mechanical_configurator);
+		registerItem("ItemWaypointCompass", waypoint_compass);
 	}
 	@SideOnly(Side.CLIENT)
 	public static void initClient(ItemModelMesher mesher)
@@ -42,10 +45,12 @@ public class ModItems
 		
 		regModel(mesher, mechanical_configurator, 0, "mechanical_configurator");
 		
+		regModel(mesher, waypoint_compass, 0, "waypointcompass/waypointcompass");
+		
 	}
 	private static <I extends Item> I registerItem(String name, I item)
 	{
-		item.setUnlocalizedName("item." + ClockworkMechanicals.MOD_ID + ":" + name);
+		item.setUnlocalizedName(ClockworkMechanicals.RESOURCE_PREFIX + name);
 		item.setRegistryName(ClockworkMechanicals.MOD_ID, name);
 		GameRegistry.register(item);
 		
@@ -55,7 +60,7 @@ public class ModItems
 	}
 	private static void regModel(ItemModelMesher mesher, Item item, int meta, String file)
 	{
-		ModelResourceLocation model = new ModelResourceLocation(ClockworkMechanicals.MOD_ID + ":" + file, "inventory");
+		ModelResourceLocation model = new ModelResourceLocation(ClockworkMechanicals.RESOURCE_PREFIX + file, "inventory");
 		ModelLoader.registerItemVariants(item, model);
 		mesher.register(item, meta, model);
 	}

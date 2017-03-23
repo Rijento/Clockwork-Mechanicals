@@ -43,7 +43,6 @@ public class ItemMainspring extends Item
 		tooltip.add(TextFormatting.WHITE + "Winding Cost: " + String.valueOf(winding_cost));
 		tooltip.add(TextFormatting.WHITE + "Maximum Tension: " + String.valueOf(max_tension));
     }
-	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> subItems)
 	{
@@ -90,7 +89,7 @@ public class ItemMainspring extends Item
 	@Override
 	public String getUnlocalizedName(ItemStack stack)
 	{
-		return "item." + ClockworkMechanicals.MOD_ID + ":" + ItemMainspringType.fromOrdinal(stack.getMetadata()).getID();
+		return "item." + ClockworkMechanicals.RESOURCE_PREFIX + ItemMainspringType.fromOrdinal(stack.getMetadata()).getID();
 	}
 	
 	

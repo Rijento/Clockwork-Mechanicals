@@ -3,7 +3,11 @@ package net.rijento.clockwork_mechanicals.items;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.input.Keyboard;
+
+import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockFarmland;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -14,8 +18,11 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
@@ -25,6 +32,17 @@ public class ItemMechanicalConfigurator extends Item
 	{
 		this.setMaxStackSize(1);
 	}
+	
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+    {
+		tooltip.add(TextFormatting.WHITE + "Number of orders: " + String.valueOf(this.getNumOrders(stack)));
+		tooltip.add(TextFormatting.WHITE + "Right-click to add order.");
+		tooltip.add(TextFormatting.WHITE + "Ctrl + right-click to remove order.");
+		tooltip.add(TextFormatting.WHITE + "Shift + right-click on mechanical to give orders.");
+    }
+	
 	@Override
 	public boolean itemInteractionForEntity(ItemStack itemstack, net.minecraft.entity.player.EntityPlayer player, EntityLivingBase entity, net.minecraft.util.EnumHand hand)
 	{
@@ -41,7 +59,7 @@ public class ItemMechanicalConfigurator extends Item
 		ItemStack stack = player.getHeldItem(hand);
 		if (worldIn.getBlockState(pos).getBlock() instanceof BlockCrops)
 		{
-			if (player.isSneaking())
+			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 			{
 				removeOrder(pos.down(), "harvest", stack);
 				return EnumActionResult.SUCCESS;
@@ -49,13 +67,29 @@ public class ItemMechanicalConfigurator extends Item
 			addOrder(pos.down(),"harvest",stack);
 			return EnumActionResult.SUCCESS;
 		}
-		if (player.isSneaking())
+		
+		if (worldIn.getBlockState(pos).getBlock() instanceof BlockChest)
 		{
-			removeOrder(pos,"harvest",stack);
+			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			{
+				removeOrder(pos.down(), "dropoff", stack);
+				return EnumActionResult.SUCCESS;
+			}
+			addOrder(pos,"dropoff",stack);
 	        return EnumActionResult.SUCCESS;
 		}
-		addOrder(pos,"dropoff",stack);
-        return EnumActionResult.SUCCESS;
+		if (worldIn.getBlockState(pos).getBlock() instanceof BlockFarmland)
+		{
+			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			{
+				removeOrder(pos.down(), "harvest", stack);
+				return EnumActionResult.SUCCESS;
+			}
+			addOrder(pos,"harvest",stack);
+	        return EnumActionResult.SUCCESS;
+		}
+		return EnumActionResult.PASS;
+		
     }
 	
 	public void addOrder(BlockPos pos, String command, ItemStack stack)
@@ -95,5 +129,14 @@ public class ItemMechanicalConfigurator extends Item
 			orders.add(new Order((NBTTagCompound) stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).get(i)));
 		}
 		return orders;
+	}
+	public int getNumOrders(ItemStack stack)
+	{
+		if (!stack.hasTagCompound())
+		{
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setTag("Orders", new NBTTagList());
+		}
+		return stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).tagCount();
 	}
 }

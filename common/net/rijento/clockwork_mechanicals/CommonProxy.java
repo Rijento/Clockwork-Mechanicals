@@ -3,6 +3,7 @@ package net.rijento.clockwork_mechanicals;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.rijento.clockwork_mechanicals.init.ModCrafting;
 import net.rijento.clockwork_mechanicals.init.ModEntities;
 import net.rijento.clockwork_mechanicals.init.ModItems;
 
@@ -17,6 +18,7 @@ public class CommonProxy
 	
 	public void init(FMLInitializationEvent event)
 	{	
+		ModCrafting.initCrafting();
 		
 	}
 	

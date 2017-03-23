@@ -1,0 +1,41 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "clockwork_mechanicals:items/waypointcompass/waypointcompass_16"
+    },
+    "overrides": [
+        { "predicate": { "angle": 0.000000 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass" },
+        { "predicate": { "angle": 0.015625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_17" },
+        { "predicate": { "angle": 0.046875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_18" },
+        { "predicate": { "angle": 0.078125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_19" },
+        { "predicate": { "angle": 0.109375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_20" },
+        { "predicate": { "angle": 0.140625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_21" },
+        { "predicate": { "angle": 0.171875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_22" },
+        { "predicate": { "angle": 0.203125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_23" },
+        { "predicate": { "angle": 0.234375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_24" },
+        { "predicate": { "angle": 0.265625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_25" },
+        { "predicate": { "angle": 0.296875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_26" },
+        { "predicate": { "angle": 0.328125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_27" },
+        { "predicate": { "angle": 0.359375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_28" },
+        { "predicate": { "angle": 0.390625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_29" },
+        { "predicate": { "angle": 0.421875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_30" },
+        { "predicate": { "angle": 0.453125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_31" },
+        { "predicate": { "angle": 0.484375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_00" },
+        { "predicate": { "angle": 0.515625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_01" },
+        { "predicate": { "angle": 0.546875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_02" },
+        { "predicate": { "angle": 0.578125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_03" },
+        { "predicate": { "angle": 0.609375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_04" },
+        { "predicate": { "angle": 0.640625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_05" },
+        { "predicate": { "angle": 0.671875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_06" },
+        { "predicate": { "angle": 0.703125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_07" },
+        { "predicate": { "angle": 0.734375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_08" },
+        { "predicate": { "angle": 0.765625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_09" },
+        { "predicate": { "angle": 0.796875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_10" },
+        { "predicate": { "angle": 0.828125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_11" },
+        { "predicate": { "angle": 0.859375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_12" },
+        { "predicate": { "angle": 0.890625 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_13" },
+        { "predicate": { "angle": 0.921875 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_14" },
+        { "predicate": { "angle": 0.953125 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass_15" },
+        { "predicate": { "angle": 0.984375 }, "model": "clockwork_mechanicals:item/waypointcompass/waypointcompass" }
+    ]
+}

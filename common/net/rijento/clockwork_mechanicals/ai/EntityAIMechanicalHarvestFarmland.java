@@ -18,15 +18,17 @@ import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
 {
     private final EntityMechanicalWorker theMechanical;
+    private final BlockPos position;
     private boolean hasFarmItem;
     /** Used to determine what the mechanical does: -1 = nothing, 0 = harvest crop, 1 = plant crop */
     private int currentTask;
     /** The "priority" of the task, only executes if the entity's current task matches this number. */
     private final int priority;
 
-    public EntityAIMechanicalHarvestFarmland(EntityMechanicalWorker theMechanicalIn, int priorityIn)
+    public EntityAIMechanicalHarvestFarmland(EntityMechanicalWorker theMechanicalIn, BlockPos posIn, int priorityIn)
     {
         this.theMechanical = theMechanicalIn;
+        this.position = posIn;
         this.priority = priorityIn;
     }
     /**
@@ -38,13 +40,14 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
     	else if (this.theMechanical.isWinding == true){return false;}
     	else if (this.theMechanical.getTension()-0.25F < 0){return false;}
     	else if (this.theMechanical.isWet()){return false;}
-    	else
+    	else if (this.theMechanical.getDistanceSqToCenter(this.position.up()) <= 0.6D)
     	{
 	    	this.currentTask = -1;
 	    	this.determineTask(this.theMechanical.getEntityWorld());
 	        this.hasFarmItem = this.isFarmItemInInventory();
 	        return true;
     	}
+    	else{return false;}
 	}
 
     /**
@@ -62,7 +65,7 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
     public void updateTask()
     {
         World world = this.theMechanical.world;
-        BlockPos blockpos = this.theMechanical.getPosition();
+        BlockPos blockpos = this.position.up();//this.theMechanical.getPosition();
         IBlockState iblockstate = world.getBlockState(blockpos);
         Block block = iblockstate.getBlock();
 
@@ -109,12 +112,13 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
                 }
             }
         }
+        this.theMechanical.nextTask();
         this.currentTask = -1;
     }
     
     protected void determineTask(World worldIn)
     {
-    	BlockPos pos = this.theMechanical.getPosition().down(1);
+    	BlockPos pos = this.position;//this.theMechanical.getPosition().down(1);
     	Block block = worldIn.getBlockState(pos).getBlock();
         if (block == Blocks.FARMLAND)
         {

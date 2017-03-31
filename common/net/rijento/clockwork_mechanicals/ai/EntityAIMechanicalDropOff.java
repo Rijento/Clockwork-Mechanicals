@@ -1,16 +1,16 @@
 package net.rijento.clockwork_mechanicals.ai;
 
-import java.util.List;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
+import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
+import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
+import net.rijento.clockwork_mechanicals.lib.filter.Whitelist;
 
 public class EntityAIMechanicalDropOff extends EntityAIBase
 {
@@ -32,7 +32,6 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		else if (!(this.theMechanical.getTension()-0.25F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
-		else if (this.runtime >= this.maxruntime){return false;}
 		else
 		{
 			this.runtime = 0;
@@ -43,6 +42,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	{
 		if (this.runtime >= this.maxruntime)
 		{
+			this.theMechanical.nextTask();
 			this.runtime = 0;
 			return false;
 		}
@@ -65,13 +65,28 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                 {
                     ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
                     Item item = mechainicalInventory.getStackInSlot(i).getItem();
-                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, chestInventory, new ItemStack(item, 1));
-
-                    if (itemstack1.isEmpty())
+                    boolean flag = true;
+                    for (FilterBase filter : this.theMechanical.filters)
                     {
-                    	itemstack.shrink(1);
-                    	this.theMechanical.unwind(0.15F);
-                        chestInventory.markDirty();
+                    	if (filter instanceof KeepAmnt)
+                    	{
+                    		
+                    		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
+                    		//System.out.println(item.toString() + flag);
+                    		break;
+                    	}
+                    	if (!flag){break;}
+                    }
+                    if (flag)
+                    {
+	                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, chestInventory, new ItemStack(item, 1));
+	                    
+	                    if (itemstack1.isEmpty())
+	                    {
+	                    	itemstack.shrink(1);
+	                    	this.theMechanical.unwind(0.15F);
+	                        chestInventory.markDirty();
+	                    }
                     }
                 }
             }

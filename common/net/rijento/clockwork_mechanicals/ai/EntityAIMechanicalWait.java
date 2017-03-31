@@ -35,7 +35,7 @@ public class EntityAIMechanicalWait extends EntityAIBase
     		this.idleTime = this.idleTimeBase;
     		return true;
     	}
-    	else{return false;}
+    	else{this.idleEntity.nextTask(); return false;}
     }
 
     /**

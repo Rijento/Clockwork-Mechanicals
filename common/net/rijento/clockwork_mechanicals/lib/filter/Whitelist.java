@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class Whitelist extends FilterBase 
 {
 	public Item item;
+	public static String type = "Whitelist";
 	
 	public Whitelist(Item itemIn)
 	{
@@ -24,7 +25,7 @@ public class Whitelist extends FilterBase
 	}
 	
 	@Override
-	protected NBTTagCompound getFilterNBT()
+	public NBTTagCompound getFilterNBT()
 	{
 		NBTTagCompound Tag = new NBTTagCompound();
 		Tag.setString("type", "Whitelist");
@@ -33,7 +34,7 @@ public class Whitelist extends FilterBase
 		return Tag;
 	}
 	
-	protected Whitelist(NBTTagCompound filterNBT)
+	public Whitelist(NBTTagCompound filterNBT)
 	{
 	ItemStack itemstack = new ItemStack(filterNBT.getCompoundTag("item"));
 		this.item = itemstack.getItem();

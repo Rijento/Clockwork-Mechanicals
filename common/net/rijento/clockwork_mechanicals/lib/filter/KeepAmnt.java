@@ -5,23 +5,23 @@ import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.rijento.clockwork_mechanicals.lib.Order;
 
 public class KeepAmnt extends FilterBase 
 {
-	public Item item;
+	public ItemStack item;
 	public int amount;
-	public String target;
+	public static String type = "KeepAmnt";
 	
-	public KeepAmnt(Item itemIn, int amountIn, String targetIn)
+	public KeepAmnt(ItemStack itemIn, int amountIn)
 	{
 		this.item = itemIn;
 		this.amount = amountIn;
-		this.target = targetIn;
 	}
 	
-	public boolean filterStatified(Item itemIn, IInventory inventory)
+	public boolean filterStatified(ItemStack itemIn, IInventory inventory)
 	{
-		if (this.item != itemIn){return true;}
+		if (!ItemStack.areItemStackTagsEqual(itemIn, this.item)){return true;}
 		int count = 0;
 		for (int i = 0; i < inventory.getSizeInventory(); ++i)
         {
@@ -30,7 +30,7 @@ public class KeepAmnt extends FilterBase
 
             if (!itemstack.isEmpty())
             {
-                if (this.item == itemstack.getItem())
+                if (ItemStack.areItemStackTagsEqual(itemstack, this.item))
                 {
                 	count += itemstack.getCount();
                 }
@@ -45,19 +45,26 @@ public class KeepAmnt extends FilterBase
 	{
 		NBTTagCompound Tag = new NBTTagCompound();
 		Tag.setString("type", "KeepAmnt");
-		Tag.setString("target", this.target);
-		Tag.setTag("item", (new ItemStack(this.item)).writeToNBT(new NBTTagCompound()));
+		Tag.setTag("item", this.item.writeToNBT(new NBTTagCompound()));
 		Tag.setInteger("amount", this.amount);
 		
 		return Tag;
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == null) {return false;}
+	    if (!KeepAmnt.class.isAssignableFrom(obj.getClass())){return false;}
+	    final KeepAmnt other = (KeepAmnt) obj;
+	    if ((this.item == null) ? (other.item != null) : !this.item.equals(other.item)){return false;}
+	    return true;
 	}
 	
 	public KeepAmnt(NBTTagCompound filterNBT)
 	{
 		ItemStack itemstack = new ItemStack(filterNBT.getCompoundTag("item"));
-		this.item = itemstack.getItem();
+		this.item = itemstack;
 		this.amount = filterNBT.getInteger("amount");
-		this.target = filterNBT.getString("target");
 	}
 	
 }

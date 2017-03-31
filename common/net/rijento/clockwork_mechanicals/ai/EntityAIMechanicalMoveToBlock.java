@@ -71,13 +71,14 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 
             if (this.timeoutCounter % 10 == 0)
             {
-                this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
+                this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 2), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
             }
+       
         }
         else
         {
             this.isAboveDestination = true;
-            this.theMechanical.nextTask();
+            //this.theMechanical.nextTask();
             this.timeoutCounter = 0;
             
         }

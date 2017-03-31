@@ -4,9 +4,10 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class FilterBase 
 {
+	public static String type = "Base";
 	public FilterBase(){}
 	
-	public boolean filterStatified(FilterBase filter){ return true;}
+	public boolean filterStatified(){ return true;}
 	
 	public NBTTagCompound getFilterNBT()
 	{
@@ -15,7 +16,7 @@ public class FilterBase
 	}
 	protected FilterBase(NBTTagCompound filterNBT){}
 	
-	public String getNBTType(NBTTagCompound filterNBT)
+	public static String getNBTType(NBTTagCompound filterNBT)
 	{
 		return filterNBT.getString("type");
 	}

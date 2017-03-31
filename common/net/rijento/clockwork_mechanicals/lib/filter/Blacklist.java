@@ -8,7 +8,8 @@ import net.minecraft.nbt.NBTTagCompound;
 public class Blacklist extends FilterBase 
 {
 	public Item item;
-	
+	public static String type = "Blacklist";
+
 	public Blacklist(Item itemIn)
 	{
 		this.item = itemIn;
@@ -24,7 +25,7 @@ public class Blacklist extends FilterBase
 	}
 	
 	@Override
-	protected NBTTagCompound getFilterNBT()
+	public NBTTagCompound getFilterNBT()
 	{
 		NBTTagCompound Tag = new NBTTagCompound();
 		Tag.setString("type", "Blacklist");
@@ -33,7 +34,7 @@ public class Blacklist extends FilterBase
 		return Tag;
 	}
 	
-	protected Blacklist(NBTTagCompound filterNBT)
+	public Blacklist(NBTTagCompound filterNBT)
 	{
 		ItemStack itemstack = new ItemStack(filterNBT.getCompoundTag("item"));
 		this.item = itemstack.getItem();

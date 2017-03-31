@@ -16,6 +16,8 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 	private final InventoryCrafting craftMatrix;
 	private final ItemStack result;
 	protected int runDelay;
+	private final static int maxruntime = 100;
+	private int runtime;
 	
 	public EntityAIMechanicalCraft(EntityMechanicalWorker mechanicalIn, int priorityIn, InventoryCrafting matrixIn) 
 	{
@@ -23,6 +25,7 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 		this.priority = priorityIn;
 		this.craftMatrix = matrixIn;
 		this.result = CraftingManager.getInstance().findMatchingRecipe(craftMatrix, this.theMechanical.getEntityWorld());
+		this.runtime = 0;
 		this.runDelay = 20;
 	}
 	
@@ -32,6 +35,7 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 		else if (!(this.theMechanical.getTension()-0.25F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
+		else if (this.runtime > this.maxruntime){this.theMechanical.nextTask(); this.runtime = 0; return false;}
 		else if (this.runDelay > 0)
 		{
 			--this.runDelay;
@@ -46,6 +50,7 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 	public void updateTask()
     {
 		this.attemptCraft();
+		runtime++;
     }
 	
 	public boolean attemptCraft()

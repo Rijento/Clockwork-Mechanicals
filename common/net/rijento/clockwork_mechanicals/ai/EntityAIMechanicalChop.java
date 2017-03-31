@@ -34,14 +34,15 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		else if (!(this.theMechanical.getTension()-0.5F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
-		else if (this.theMechanical.world.getBlockState(target).getBlock() == Blocks.AIR){return this.hasSaplings();}
-		else if (this.theMechanical.world.getBlockState(target).getBlock() instanceof BlockLog)
+		else if (this.theMechanical.world.getBlockState(target).getBlock() == Blocks.AIR && this.theMechanical.getDistanceSqToCenter(this.target) <= 1D){return this.hasSaplings();}
+		else if (this.theMechanical.world.getBlockState(target).getBlock() instanceof BlockLog && this.theMechanical.getDistanceSqToCenter(this.target) <= 2D)
 		{
 			this.currentTask = 1;
 			if (this.ticks < 0){this.ticks = 100;}
 			return true;
 		}
 		else if (this.ticks >= 0){return true;}
+		else if (this.theMechanical.getDistanceSqToCenter(this.target) <= 1.0D){this.theMechanical.nextTask(); return false;}
 		else{return false;}
 	}
 	
@@ -57,8 +58,8 @@ public class EntityAIMechanicalChop extends EntityAIBase
                 return true;
             }
         }
-
-	        return false;
+		if (this.theMechanical.getDistanceSqToCenter(this.target) <= 0.6D){this.theMechanical.nextTask();}
+	    return false;
 	}
 	private ItemStack getSaplings()
 	{

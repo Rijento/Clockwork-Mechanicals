@@ -10,10 +10,13 @@ import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityGolem;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemSeedFood;
+import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -29,13 +32,17 @@ import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalCraft;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalDropOff;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalHarvestFarmland;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
+import net.rijento.clockwork_mechanicals.ai.PathNavigateMechanical;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.ContainerBasic;
 import net.rijento.clockwork_mechanicals.lib.Order;
+import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
+import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
 
 public class EntityMechanicalWorker extends EntityGolem 
 {
 	public List<Order> orders;
+	public List<FilterBase> filters = new ArrayList<FilterBase>();
 	public boolean isWinding = false;
 	private ItemMainspring Mainspring;
 	private int currentTask;
@@ -48,6 +55,7 @@ public class EntityMechanicalWorker extends EntityGolem
 		this.workerInventory = new InventoryBasic("Items", false, 9);
 		this.setSize(0.6F, 0.95F);
 		this.maxTension = 0F;
+		this.navigator = new PathNavigateMechanical(this, worldIn);
 		this.setCanPickUpLoot(true);
 	}
 	protected boolean isAIEnabled()
@@ -112,8 +120,19 @@ public class EntityMechanicalWorker extends EntityGolem
 			switch(order.command)
 			{
 			case "harvest":
-				EntityAIMechanicalHarvestFarmland taskHarvest = new EntityAIMechanicalHarvestFarmland(this, i);
+				EntityAIMechanicalHarvestFarmland taskHarvest = new EntityAIMechanicalHarvestFarmland(this, order.pos, i);
 				this.tasks.addTask(i, taskHarvest);
+				KeepAmnt keepSeeds = new KeepAmnt(new ItemStack(Items.WHEAT_SEEDS), 10);
+				KeepAmnt keepSeeds1 = new KeepAmnt(new ItemStack(Items.BEETROOT_SEEDS), 10);
+				KeepAmnt keepSeeds2 = new KeepAmnt(new ItemStack(Items.CARROT), 10);
+				KeepAmnt keepSeeds3 = new KeepAmnt(new ItemStack(Items.POTATO), 10);
+				if (!this.filters.contains(keepSeeds))
+				{
+					this.filters.add(keepSeeds);
+					this.filters.add(keepSeeds1);
+					this.filters.add(keepSeeds2);
+					this.filters.add(keepSeeds3);
+				}
 				continue;
 			case "dropoff":
 				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i);
@@ -129,6 +148,12 @@ public class EntityMechanicalWorker extends EntityGolem
 			case "chop":
 				EntityAIMechanicalChop taskChop = new EntityAIMechanicalChop(this, order.pos, i);
 				this.tasks.addTask(i, taskChop);
+				ItemStack temp = new ItemStack(Blocks.SAPLING);
+				KeepAmnt keepSaplings = new KeepAmnt(temp, 10);
+				if (!this.filters.contains(keepSaplings))
+				{
+					this.filters.add(keepSaplings);
+				}
 				continue;
 			}
 		}
@@ -265,6 +290,11 @@ public class EntityMechanicalWorker extends EntityGolem
 			this.workerInventory.setInventorySlotContents(i, inventoryIn.getStackInSlot(i));
 		}
 	}
+	@Override
+	public boolean isEntityInvulnerable(DamageSource source)
+    {
+        return source == DamageSource.IN_WALL || source == DamageSource.ON_FIRE || source == DamageSource.CACTUS;
+    }
 	
 	public void onDeath(DamageSource cause)
 	{

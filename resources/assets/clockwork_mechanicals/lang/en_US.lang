@@ -1,0 +1,16 @@
+item.clockwork_mechanicals:waypointcompass.name=Waypoint Compass
+item.clockwork_mechanicals:ItemWindingKey.name=Winding Key
+item.clockwork_mechanicals:ItemMechanicalConfigurator.name=Mechanical Configurator
+item.clockwork_mechanicals:ingotBrass.name=Brass Ingot
+item.clockwork_mechanicals:ingotZinc.name=Zinc Ingot
+item.clockwork_mechanicals:ingotCopper.name=Copper Ingot
+item.clockwork_mechanicals:ItemMoldTemplate.name=Mold Template
+item.clockwork_mechanicals:ItemBlankMold.name=Blank Mold
+item.clockwork_mechanicals:ItemMainspringBrass.name=Brass Mainspring
+item.clockwork_mechanicals:ItemMainspringIron.name=Iron Mainspring
+item.clockwork_mechanicals:ItemMainspringCopper.name=Copper Mainspring
+item.clockwork_mechanicals:ItemMainspringZinc.name=Zinc Mainspring
+item.clockwork_mechanicals:ItemMainspringGold.name=Gold Mainspring
+item.clockwork_mechanicals:ItemGearSmall.name=Small Gear
+
+itemGroup.clockwork_mechanicals=Clockwork Mechanicals

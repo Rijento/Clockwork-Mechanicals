@@ -7,9 +7,13 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockFarmland;
+import net.minecraft.block.BlockWorkbench;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -72,7 +76,7 @@ public class ItemMechanicalConfigurator extends Item
 		{
 			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 			{
-				removeOrder(pos.down(), "dropoff", stack);
+				removeOrder(pos, "dropoff", stack);
 				return EnumActionResult.SUCCESS;
 			}
 			addOrder(pos,"dropoff",stack);
@@ -82,10 +86,30 @@ public class ItemMechanicalConfigurator extends Item
 		{
 			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 			{
-				removeOrder(pos.down(), "harvest", stack);
+				removeOrder(pos, "harvest", stack);
 				return EnumActionResult.SUCCESS;
 			}
 			addOrder(pos,"harvest",stack);
+	        return EnumActionResult.SUCCESS;
+		}
+		if (worldIn.getBlockState(pos).getBlock() instanceof BlockWorkbench)
+		{
+			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			{
+				removeOrder(pos, "craft", stack);
+				return EnumActionResult.SUCCESS;
+			}
+			addOrder(pos,"craft",stack);
+	        return EnumActionResult.SUCCESS;
+		}
+		if (worldIn.getBlockState(pos) ==Blocks.DIRT.getDefaultState().withProperty(PropertyEnum.<BlockDirt.DirtType>create("variant", BlockDirt.DirtType.class), BlockDirt.DirtType.byMetadata(BlockDirt.DirtType.COARSE_DIRT.getMetadata())))
+		{
+			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			{
+				removeOrder(pos, "chop", stack);
+				return EnumActionResult.SUCCESS;
+			}
+			addOrder(pos,"chop",stack);
 	        return EnumActionResult.SUCCESS;
 		}
 		return EnumActionResult.PASS;
@@ -138,5 +162,9 @@ public class ItemMechanicalConfigurator extends Item
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
 		}
 		return stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).tagCount();
+	}
+	public int getComplexity(ItemStack stack)
+	{
+		return getNumOrders(stack) % 5;
 	}
 }

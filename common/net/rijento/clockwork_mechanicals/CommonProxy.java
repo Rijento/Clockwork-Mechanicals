@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.rijento.clockwork_mechanicals.init.ModCrafting;
 import net.rijento.clockwork_mechanicals.init.ModEntities;
 import net.rijento.clockwork_mechanicals.init.ModItems;
+import net.rijento.clockwork_mechanicals.init.ModOreDict;
 
 public class CommonProxy 
 {	
@@ -18,6 +19,7 @@ public class CommonProxy
 	
 	public void init(FMLInitializationEvent event)
 	{	
+		ModOreDict.init();
 		ModCrafting.initCrafting();
 		
 	}

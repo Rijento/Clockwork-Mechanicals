@@ -1,5 +1,7 @@
 package net.rijento.clockwork_mechanicals.items;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
@@ -17,6 +19,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,7 +29,7 @@ public class ItemWaypointCompass extends Item
 {
 	public ItemWaypointCompass()
 	{
-		this.addPropertyOverride(new ResourceLocation("angle"), new IItemPropertyGetter()
+		this.addPropertyOverride(new ResourceLocation("waypointangle"), new IItemPropertyGetter()
         {
             @SideOnly(Side.CLIENT)
             double rotation;
@@ -53,11 +56,11 @@ public class ItemWaypointCompass extends Item
 
                     double d0;
 
-                    if (worldIn.provider.isSurfaceWorld() && hasPos(stack))
+                    if (worldIn.provider.isSurfaceWorld() && hasTarget(stack))
                     {
                         double d1 = flag ? (double)entity.rotationYaw : this.getFrameRotation((EntityItemFrame)entity);
                         d1 = MathHelper.positiveModulo(d1 / 360.0D, 1.0D);
-                        double d2 = this.getAngleToBlock(getTargetPos(stack), (EntityPlayer)entity)/ (Math.PI * 2D);
+                        double d2 = this.getAngleToBlock(getTargetPos(stack), entity)/ (Math.PI * 2D);
                         d0 = 0.5D - (d1 - 0.25D - d2);
                     }
                     else
@@ -101,6 +104,25 @@ public class ItemWaypointCompass extends Item
         });
     }
 	@Override
+	@SideOnly(Side.CLIENT)
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+    {
+		tooltip.add(TextFormatting.WHITE + "Shift + right-click to set point.");
+		if (hasTarget(stack))
+		{
+			BlockPos pos = getTargetPos(stack);
+			tooltip.add(TextFormatting.WHITE + "Current Target: " + pos.toString());
+		}
+		else
+		{
+			tooltip.add(TextFormatting.WHITE + "Current Target: None");
+		}
+		tooltip.add(TextFormatting.RED + "Known bug: texture for waypoint compass points to either current active waypoint compass or first waypoint compass in inventory. When using more than one, hold desired compass to update its texture.");
+		
+    }
+	
+	
+	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
 		if (player.isSneaking())
@@ -118,12 +140,12 @@ public class ItemWaypointCompass extends Item
 		{
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("target", new NBTTagCompound());
-			stack.getTagCompound().setBoolean("hasPos", false);
+			stack.getTagCompound().setBoolean("hasTarget", false);
 		}
 		((NBTTagCompound)stack.getTagCompound().getTag("target")).setInteger("x", pos.getX());
 		((NBTTagCompound)stack.getTagCompound().getTag("target")).setInteger("y", pos.getY());
 		((NBTTagCompound)stack.getTagCompound().getTag("target")).setInteger("z", pos.getZ());
-		stack.getTagCompound().setBoolean("hasPos", true);
+		stack.getTagCompound().setBoolean("hasTarget", true);
 	}
 	private BlockPos getTargetPos(ItemStack stack)
 	{
@@ -132,7 +154,7 @@ public class ItemWaypointCompass extends Item
 		{
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("target", new NBTTagCompound());
-			stack.getTagCompound().setBoolean("hasPos", false);
+			stack.getTagCompound().setBoolean("hasTarget", false);
 		}
 		int x = stack.getTagCompound().getCompoundTag("target").getInteger("x");
 		int y = stack.getTagCompound().getCompoundTag("target").getInteger("y");
@@ -140,16 +162,17 @@ public class ItemWaypointCompass extends Item
 		return new BlockPos(x, y, z);
 		
 	}
-	private boolean hasPos(ItemStack stack)
+	private boolean hasTarget(ItemStack stack)
 	{
 		if (!stack.hasTagCompound())
 		{
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("target", new NBTTagCompound());
-			stack.getTagCompound().setBoolean("hasPos", false);
+			stack.getTagCompound().setBoolean("hasTarget", false);
 		}
-		return stack.getTagCompound().getBoolean("hasPos");
+		return stack.getTagCompound().getBoolean("hasTarget");
 	}
+	
 	@Override
 	public String getUnlocalizedName(ItemStack stack)
 	{

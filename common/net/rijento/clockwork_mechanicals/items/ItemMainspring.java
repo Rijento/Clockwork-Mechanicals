@@ -7,11 +7,13 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
+import net.rijento.clockwork_mechanicals.init.ModItems;
 
 public class ItemMainspring extends Item
 {
@@ -27,6 +29,8 @@ public class ItemMainspring extends Item
 	{
 		this.setHasSubtypes(true);
 		this.setMaxStackSize(1);
+		this.setMaxDamage(0);
+		this.setCreativeTab(ModItems.modTab);
 	}
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -43,12 +47,14 @@ public class ItemMainspring extends Item
 		tooltip.add(TextFormatting.WHITE + "Winding Cost: " + String.valueOf(winding_cost));
 		tooltip.add(TextFormatting.WHITE + "Maximum Tension: " + String.valueOf(max_tension));
     }
+	
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> subItems)
+	@Override
+	public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems)
 	{
 		for (ItemMainspringType type : ITEM_VARIANTS)
 		{
-			subItems.add(new ItemStack(item, 1, type.ordinal()));
+			subItems.add(new ItemStack(itemIn, 1, type.ordinal()));
 		}
 	}
 	
@@ -89,7 +95,7 @@ public class ItemMainspring extends Item
 	@Override
 	public String getUnlocalizedName(ItemStack stack)
 	{
-		return "item." + ClockworkMechanicals.RESOURCE_PREFIX + ItemMainspringType.fromOrdinal(stack.getMetadata()).getID();
+		return "item." + ClockworkMechanicals.RESOURCE_PREFIX + "ItemMainspring" + ItemMainspringType.fromOrdinal(stack.getMetadata()).getID();
 	}
 	
 	

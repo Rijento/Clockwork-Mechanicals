@@ -9,7 +9,9 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityGolem;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,10 +24,13 @@ import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalChop;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalCraft;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalDropOff;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalHarvestFarmland;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
+import net.rijento.clockwork_mechanicals.lib.ContainerBasic;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
 public class EntityMechanicalWorker extends EntityGolem 
@@ -109,9 +114,22 @@ public class EntityMechanicalWorker extends EntityGolem
 			case "harvest":
 				EntityAIMechanicalHarvestFarmland taskHarvest = new EntityAIMechanicalHarvestFarmland(this, i);
 				this.tasks.addTask(i, taskHarvest);
+				continue;
 			case "dropoff":
 				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i);
 				this.tasks.addTask(i, taskDropoff);
+				continue;
+			case "craft":
+				InventoryCrafting recipe = new InventoryCrafting(new ContainerBasic(), 3, 3);
+				recipe.setInventorySlotContents(5, new ItemStack(Blocks.PLANKS, 1));
+				recipe.setInventorySlotContents(8, new ItemStack(Blocks.PLANKS, 1));
+				EntityAIMechanicalCraft taskCraft = new EntityAIMechanicalCraft(this, i, recipe);
+				this.tasks.addTask(i, taskCraft);
+				continue;
+			case "chop":
+				EntityAIMechanicalChop taskChop = new EntityAIMechanicalChop(this, order.pos, i);
+				this.tasks.addTask(i, taskChop);
+				continue;
 			}
 		}
 	}
@@ -239,6 +257,13 @@ public class EntityMechanicalWorker extends EntityGolem
 	public InventoryBasic getMechanicalInventory()
 	{
 		return this.workerInventory;
+	}
+	public void overrideMechanicalInventory(InventoryBasic inventoryIn)
+	{
+		for (int i = 0; i < inventoryIn.getSizeInventory(); i++)
+		{
+			this.workerInventory.setInventorySlotContents(i, inventoryIn.getStackInSlot(i));
+		}
 	}
 	
 	public void onDeath(DamageSource cause)

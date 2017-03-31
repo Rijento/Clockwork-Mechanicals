@@ -1,7 +1,7 @@
 {
-    "parent": "builtin/generated",
+    "parent": "item/generated",
     "textures": {
-        "layer0": "clockwork_mechanicals:items/mechanical_configurator"
+        "layer0": "clockwork_mechanicals:items/mold_template"
     },
     "display": {
 		"thirdperson_righthand": {

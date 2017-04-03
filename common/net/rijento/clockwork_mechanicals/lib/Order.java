@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 import net.rijento.clockwork_mechanicals.lib.filter.Blacklist;
@@ -17,6 +18,7 @@ public class Order
 	public final BlockPos pos;
 	public final String command;
 	public final List<FilterBase> filters = new ArrayList<FilterBase>();
+	public EnumFacing facing;
 
 	public Order(BlockPos pos, String command)
 	{
@@ -32,6 +34,10 @@ public class Order
 			this.filters.add(filter);
 		}
 	}
+	public void setFacing(EnumFacing dirIn)
+	{
+		this.facing = dirIn;
+	}
 	
 	public NBTTagCompound getOrderNBT(Order this)
 	{
@@ -42,6 +48,7 @@ public class Order
 		
 		Tag.setString("Command", command);
 		Tag.setBoolean("hasfilters", false);
+		Tag.setBoolean("hasfacing", false);
 		
 		if (!this.filters.isEmpty())
 		{
@@ -52,6 +59,11 @@ public class Order
 			}
 			Tag.setTag("filters", list);
 			Tag.setBoolean("hasfilters", true);
+		}
+		if (!(this.facing == null))
+		{
+			Tag.setString("facing", this.facing.getName());
+			Tag.setBoolean("hasfacing", true);
 		}
 		
 		return Tag;
@@ -79,6 +91,10 @@ public class Order
 					continue;
 				}
 	        }
+		}
+		if (orderNBT.getBoolean("hasfacing"))
+		{
+			this.facing = EnumFacing.byName(orderNBT.getString("facing"));
 		}
 	}
 	@Override

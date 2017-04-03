@@ -56,13 +56,13 @@ public class EntityAIMechanicalMine extends EntityAIBase
 			}
 			else
 			{
-				if (this.runtime > 21){this.runtime = 1;}
+				if (this.runtime > 26){this.runtime = 1;}
 				return true;
 			}
 		}
 		else
 		{
-			if (this.runtime > 21){this.runtime = 1;}
+			if (this.runtime > 26){this.runtime = 1;}
 			return true;
 		}
 	}
@@ -86,9 +86,9 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		BlockPos pos = this.theMechanical.getPosition();
 		BlockPos topBreak = pos.offset(this.direction).up();
 		BlockPos botBreak = pos.offset(this.direction);
-		Boolean toptest = world.getBlockState(topBreak).getBlock().isBlockSolid(world, topBreak, this.direction.getOpposite());
-		Boolean bottest = world.getBlockState(botBreak).getBlock().isBlockSolid(world, botBreak, this.direction.getOpposite());
-		if (this.runtime % 21 == 0)
+		Boolean toptest = world.getBlockState(topBreak).getBlock().isBlockSolid(world, topBreak, this.direction.getOpposite()) && !(world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK) && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
+		Boolean bottest = world.getBlockState(botBreak).getBlock().isBlockSolid(world, botBreak, this.direction.getOpposite()) && !(world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK) && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
+		if (this.runtime % 26 == 0)
 		{
 			if (toptest)
 			{
@@ -192,7 +192,8 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		World world = this.theMechanical.getEntityWorld();
 		BlockPos pos = this.theMechanical.getPosition();
 		double blocks = Math.floor(Math.sqrt(this.theMechanical.getDistanceSq(this.start)));
-		if ((blocks * 0.1D) >= this.theMechanical.getTension()){return true;}
+		if (((blocks + 10) * 0.1D) >= this.theMechanical.getTension()){return true;}
+		else if(blocks >= 100){return true;}
 		else{return false;}
 	}
 }

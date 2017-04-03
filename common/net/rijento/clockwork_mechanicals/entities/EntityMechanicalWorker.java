@@ -28,6 +28,8 @@ import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalChop;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalCraft;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalDropOff;
@@ -81,7 +83,7 @@ public class EntityMechanicalWorker extends EntityGolem
         double d1 = this.posZ - this.prevPosZ;
         double f1 = d0 * d0 + d1 * d1;
         float distance = (float)Math.sqrt(f1);
-        if (distance > 0.0F){this.unwind(0.5F * distance);}
+        if (distance > 0.0F){this.unwind(0.25F * distance);}
 		super.onUpdate();
 	}
 	
@@ -170,7 +172,7 @@ public class EntityMechanicalWorker extends EntityGolem
 				}
 				continue;
 			case "mine":
-				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, EnumFacing.NORTH, true, i);
+				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, order.facing, true, i);
 				this.tasks.addTask(i, taskMine);
 				KeepAmnt keepTorches = new KeepAmnt(new ItemStack(Blocks.TORCH), 64);
 				KeepAmnt keepPickaxe = new KeepAmnt(new ItemStack(Items.WOODEN_PICKAXE), 1);
@@ -276,9 +278,6 @@ public class EntityMechanicalWorker extends EntityGolem
         p_190672_2_ = super.onInitialSpawn(p_190672_1_, p_190672_2_);
         return p_190672_2_;
     }
-    
-    
-    
 	public void wind(float rate)
 	{
 		if (this.Mainspring != null){			
@@ -286,8 +285,9 @@ public class EntityMechanicalWorker extends EntityGolem
 			{
 				this.tension += (rate/this.Mainspring.getWindingCost());
 				this.isWinding = true;
-				System.out.println(this.tension);
 			}
+			if (world.isRemote){System.out.println("Client: " + this.tension);}
+			else{System.out.println("Server: " + this.tension);}
 		}
 		this.isWinding = false;
 	}

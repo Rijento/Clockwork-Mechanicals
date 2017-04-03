@@ -69,7 +69,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	public void updateTask()
     {
 		Block block = this.theMechanical.getEntityWorld().getBlockState(targetChest).getBlock();
-		if (!(block instanceof BlockChest) || this.theMechanical.getDistanceSqToCenter(this.targetChest.up()) > 1.0D){return;}
+		if (!(block instanceof BlockChest) || this.theMechanical.getDistanceSqToCenter(this.targetChest) > 1.0D){return;}
 		else
 		{
 			IInventory chestInventory = ((BlockChest)block).getContainer(this.theMechanical.getEntityWorld(), this.targetChest, true);

@@ -120,7 +120,10 @@ public class ItemMechanicalConfigurator extends Item
 				removeOrder(pos, "mine", stack);
 				return EnumActionResult.SUCCESS;
 			}
-			addOrder(pos,"mine",stack);
+			Order mine = new Order(pos,"mine");
+			mine.setFacing(facing.getOpposite());
+			addOrder(mine, stack);
+			
 	        return EnumActionResult.SUCCESS;
 		}
 		return EnumActionResult.PASS;
@@ -142,6 +145,22 @@ public class ItemMechanicalConfigurator extends Item
 			stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).appendTag(toAddNBT);
 		}
 	}
+	public void addOrder(Order order, ItemStack stack)
+	{
+		List<Order> orders = this.getOrders(stack);
+		if (!stack.hasTagCompound())
+		{
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setTag("Orders", new NBTTagList());
+		}
+		Order toAdd = order;
+		NBTTagCompound toAddNBT = toAdd.getOrderNBT();
+		if (!orders.contains(toAdd))
+		{
+			stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).appendTag(toAddNBT);
+		}
+	}
+	
 	public void removeOrder(BlockPos pos, String command, ItemStack stack)
 	{
 		List<Order> orders = this.getOrders(stack);

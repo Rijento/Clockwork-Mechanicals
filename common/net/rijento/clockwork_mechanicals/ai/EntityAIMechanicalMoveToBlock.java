@@ -72,11 +72,11 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 
             this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
            
-            if ((this.timeoutCounter < 20))
+            if ((this.timeoutCounter < 10))
             {
             	this.theMechanical.getNavigator().clearPathEntity();
             }
-            if (this.timeoutCounter > 30)
+            if (this.timeoutCounter > 20)
             {
             	this.timeoutCounter = 0;
             }

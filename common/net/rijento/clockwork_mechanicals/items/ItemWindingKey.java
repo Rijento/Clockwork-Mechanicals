@@ -31,7 +31,7 @@ public class ItemWindingKey extends Item
 	{
 		if (entity instanceof EntityMechanicalWorker && player.isSneaking())
 		{
-			((EntityMechanicalWorker) entity).wind(5.0F);
+			((EntityMechanicalWorker) entity).wind(2.5F);
 			return true;
 		}
 		return false;

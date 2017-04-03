@@ -31,11 +31,11 @@ public class EntityAIMechanicalChop extends EntityAIBase
 	public boolean shouldExecute()
 	{
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
-		else if (!(this.theMechanical.getTension()-0.5F>0)){return false;}
+		else if (!(this.theMechanical.getTension()-0.75F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
 		else if (this.theMechanical.world.getBlockState(target).getBlock() == Blocks.AIR && this.theMechanical.getDistanceSqToCenter(this.target) <= 1D){return this.hasSaplings();}
-		else if (this.theMechanical.world.getBlockState(target).getBlock() instanceof BlockLog && this.theMechanical.getDistanceSqToCenter(this.target) <= 2D)
+		else if (this.theMechanical.world.getBlockState(target).getBlock() instanceof BlockLog && this.theMechanical.getDistanceSqToCenter(this.target) <= 2.5D)
 		{
 			this.currentTask = 1;
 			if (this.ticks < 0){this.ticks = 100;}
@@ -80,6 +80,7 @@ public class EntityAIMechanicalChop extends EntityAIBase
     {
 		if (this.currentTask == 0)
 		{
+			this.theMechanical.unwind(0.25F);
 			this.theMechanical.world.setBlockState(target, Blocks.SAPLING.getDefaultState().withProperty(PropertyEnum.<BlockPlanks.EnumType>create("type", BlockPlanks.EnumType.class), BlockPlanks.EnumType.byMetadata(this.getSaplings().getMetadata() & 7)));
 		}
 		else

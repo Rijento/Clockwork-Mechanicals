@@ -19,9 +19,9 @@ public class KeepAmnt extends FilterBase
 		this.amount = amountIn;
 	}
 	
-	public boolean filterStatified(ItemStack itemIn, IInventory inventory)
+	public int filterStatified(ItemStack itemIn, IInventory inventory)
 	{
-		if (!ItemStack.areItemStackTagsEqual(itemIn, this.item)){return true;}
+		if (!ItemStack.areItemsEqualIgnoreDurability(itemIn, this.item)){return -1;}
 		int count = 0;
 		for (int i = 0; i < inventory.getSizeInventory(); ++i)
         {
@@ -30,14 +30,19 @@ public class KeepAmnt extends FilterBase
 
             if (!itemstack.isEmpty())
             {
-                if (ItemStack.areItemStackTagsEqual(itemstack, this.item))
+                
+                if (ItemStack.areItemsEqual(itemstack, this.item))
+                {
+                	count += itemstack.getCount();
+                }
+                else if (ItemStack.areItemsEqualIgnoreDurability(itemstack, this.item))
                 {
                 	count += itemstack.getCount();
                 }
             }
         }
-		if (count > this.amount){return true;}
-		else{return false;}
+		if (count > this.amount){return 1;}
+		else{return 0;}
 	}
 	
 	@Override

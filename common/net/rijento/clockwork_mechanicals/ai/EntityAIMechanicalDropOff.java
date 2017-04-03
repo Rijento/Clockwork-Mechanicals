@@ -19,6 +19,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	private final BlockPos targetChest;
 	private final static int maxruntime = 100;
 	private int runtime;
+	private boolean fullyempty = true;
 	
 	public EntityAIMechanicalDropOff( EntityMechanicalWorker theMechanicalIn, BlockPos chestIn, int priorityIn)
 	{
@@ -29,18 +30,33 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	@Override
 	public boolean shouldExecute() {
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
-		else if (!(this.theMechanical.getTension()-0.25F>0)){return false;}
+		else if (!(this.theMechanical.getTension()-0.15F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
 		else
 		{
 			this.runtime = 0;
-			return true;}
+			return true;	
+		}
 	}
 	@Override
 	public boolean continueExecuting()
 	{
-		if (this.runtime >= this.maxruntime)
+		if (this.fullyempty == true)
+		{
+			if (this.checkEmpty() == true)
+			{
+				if (this.runtime >= this.maxruntime)
+				{
+					this.theMechanical.nextTask();
+					this.runtime = 0;
+					return false;
+				}
+				this.runtime++;
+			}
+			else{return true;}
+		}
+		else if (this.runtime >= this.maxruntime)
 		{
 			this.theMechanical.nextTask();
 			this.runtime = 0;
@@ -65,26 +81,24 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                 {
                     ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
                     Item item = mechainicalInventory.getStackInSlot(i).getItem();
-                    boolean flag = true;
+                    int flag = 1;
                     for (FilterBase filter : this.theMechanical.filters)
                     {
                     	if (filter instanceof KeepAmnt)
                     	{
                     		
                     		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
-                    		//System.out.println(item.toString() + flag);
-                    		break;
+                    		if (flag == 0){break;}
                     	}
-                    	if (!flag){break;}
                     }
-                    if (flag)
+                    if (!(flag == 0))
                     {
-	                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, chestInventory, new ItemStack(item, 1));
+	                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, chestInventory, new ItemStack(item, 1, itemstack.getMetadata()));
 	                    
 	                    if (itemstack1.isEmpty())
 	                    {
 	                    	itemstack.shrink(1);
-	                    	this.theMechanical.unwind(0.15F);
+	                    	this.theMechanical.unwind(0.05F);
 	                        chestInventory.markDirty();
 	                    }
                     }
@@ -125,4 +139,40 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
     {
         return stack1.getItem() != stack2.getItem() ? false : (stack1.getMetadata() != stack2.getMetadata() ? false : (stack1.getCount() > stack1.getMaxStackSize() ? false : ItemStack.areItemStackTagsEqual(stack1, stack2)));
     }
+	
+	private boolean checkEmpty()
+	{
+		if (this.theMechanical.getMechanicalInventory().isEmpty()){return true;}
+		if (this.theMechanical.filters.isEmpty())
+		{
+			return this.theMechanical.getMechanicalInventory().isEmpty();
+		}
+		else
+		{
+			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
+			int size = this.theMechanical.getMechanicalInventory().getSizeInventory();
+			for (int i = 0; i < size; ++i)
+            {
+                if (!mechainicalInventory.getStackInSlot(i).isEmpty())
+                {
+                    ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
+                    int flag = 1;
+                    for (FilterBase filter : this.theMechanical.filters)
+                    {
+                    	if (filter instanceof KeepAmnt)
+                    	{
+                    		
+                    		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
+                    		if (flag == 1){return false;}
+                    	}
+                    }
+                    if (flag == -1)
+                    {
+                    	return false;
+                    }
+                }
+            }
+			return true;
+		}
+	}
 }

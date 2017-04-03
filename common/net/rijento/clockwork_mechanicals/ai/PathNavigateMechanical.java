@@ -24,21 +24,31 @@ public class PathNavigateMechanical extends PathNavigate {
 		
 	}
 
+
+    @Override
     protected PathFinder getPathFinder()
     {
         this.nodeProcessor = new WalkNodeProcessor();
         this.nodeProcessor.setCanEnterDoors(true);
         return new PathFinder(this.nodeProcessor);
     }
-
+    @Override
+    public float getPathSearchRange()
+    {
+        return 200f;
+    }
     /**
      * If on ground or swimming and can swim
      */
+
+    @Override
     protected boolean canNavigate()
     {
-        return this.theEntity.onGround;
+        return true; //this.theEntity.onGround;
     }
 
+
+    @Override
     protected Vec3d getEntityPosition()
     {
         return new Vec3d(this.theEntity.posX, (double)this.getPathablePosY(), this.theEntity.posZ);
@@ -47,6 +57,7 @@ public class PathNavigateMechanical extends PathNavigate {
     /**
      * Returns path to given BlockPos
      */
+    @Override
     public Path getPathToPos(BlockPos pos)
     {
         if (this.world.getBlockState(pos).getMaterial() == Material.AIR)
@@ -91,6 +102,8 @@ public class PathNavigateMechanical extends PathNavigate {
     /**
      * Returns the path to the given EntityLiving. Args : entity
      */
+
+    @Override
     public Path getPathToEntityLiving(Entity entityIn)
     {
         return this.getPathToPos(new BlockPos(entityIn));
@@ -99,6 +112,7 @@ public class PathNavigateMechanical extends PathNavigate {
     /**
      * Gets the safe pathing Y position for the entity depending on if it can path swim or not
      */
+    
     private int getPathablePosY()
     {
         if (this.theEntity.isInWater())
@@ -126,12 +140,16 @@ public class PathNavigateMechanical extends PathNavigate {
             return (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D);
         }
     }
-    /**
-     * Checks if the specified entity can safely walk to the specified location.
-     */
+   @Override
+   public boolean canEntityStandOnPos(BlockPos pos)
+   {
+       return true;
+   }
+
+    @Override
     protected boolean isDirectPathBetweenPoints(Vec3d posVec31, Vec3d posVec32, int sizeX, int sizeY, int sizeZ)
     {
-    	return false;
+    	return true;
     }
     @Override 
     protected void checkForStuck(Vec3d positionVec3)

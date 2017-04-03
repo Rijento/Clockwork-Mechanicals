@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.datafix.walkers.ItemStackDataLists;
@@ -31,6 +32,7 @@ import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalChop;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalCraft;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalDropOff;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalHarvestFarmland;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMine;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
 import net.rijento.clockwork_mechanicals.ai.PathNavigateMechanical;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
@@ -62,6 +64,15 @@ public class EntityMechanicalWorker extends EntityGolem
 	{
 	   return true;
 	}
+	@Override
+	public float getAIMoveSpeed()
+    {
+		if (this.Mainspring != null)
+		{
+			return 0.25F * this.getMainspring().getResistance();
+		}
+		else{return 0.0f;}
+    }
 	
 	@Override
 	public void onUpdate()
@@ -116,11 +127,11 @@ public class EntityMechanicalWorker extends EntityGolem
 		for (int i = 0; i < this.orders.size(); i++)
 		{
 			Order order = this.orders.get(i);
-			this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 			switch(order.command)
 			{
 			case "harvest":
 				EntityAIMechanicalHarvestFarmland taskHarvest = new EntityAIMechanicalHarvestFarmland(this, order.pos, i);
+				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskHarvest);
 				KeepAmnt keepSeeds = new KeepAmnt(new ItemStack(Items.WHEAT_SEEDS), 10);
 				KeepAmnt keepSeeds1 = new KeepAmnt(new ItemStack(Items.BEETROOT_SEEDS), 10);
@@ -136,6 +147,7 @@ public class EntityMechanicalWorker extends EntityGolem
 				continue;
 			case "dropoff":
 				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i);
+				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskDropoff);
 				continue;
 			case "craft":
@@ -143,16 +155,28 @@ public class EntityMechanicalWorker extends EntityGolem
 				recipe.setInventorySlotContents(5, new ItemStack(Blocks.PLANKS, 1));
 				recipe.setInventorySlotContents(8, new ItemStack(Blocks.PLANKS, 1));
 				EntityAIMechanicalCraft taskCraft = new EntityAIMechanicalCraft(this, i, recipe);
+				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskCraft);
 				continue;
 			case "chop":
 				EntityAIMechanicalChop taskChop = new EntityAIMechanicalChop(this, order.pos, i);
+				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskChop);
 				ItemStack temp = new ItemStack(Blocks.SAPLING);
 				KeepAmnt keepSaplings = new KeepAmnt(temp, 10);
 				if (!this.filters.contains(keepSaplings))
 				{
 					this.filters.add(keepSaplings);
+				}
+				continue;
+			case "mine":
+				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, EnumFacing.NORTH, true, i);
+				this.tasks.addTask(i, taskMine);
+				KeepAmnt keepTorches = new KeepAmnt(new ItemStack(Blocks.TORCH), 64);
+				KeepAmnt keepPickaxe = new KeepAmnt(new ItemStack(Items.WOODEN_PICKAXE), 1);
+				if (!this.filters.contains(keepTorches))
+				{
+					this.filters.add(keepTorches);
 				}
 				continue;
 			}
@@ -262,7 +286,7 @@ public class EntityMechanicalWorker extends EntityGolem
 			{
 				this.tension += (rate/this.Mainspring.getWindingCost());
 				this.isWinding = true;
-				System.out.print(this.tension);
+				System.out.println(this.tension);
 			}
 		}
 		this.isWinding = false;

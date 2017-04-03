@@ -38,6 +38,7 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
         else
         {
         	this.runDelay = 20;
+        	this.timeoutCounter = 0;
         	return true;
         }
     }
@@ -69,9 +70,15 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
             this.isAboveDestination = false;
             ++this.timeoutCounter;
 
-            if (this.timeoutCounter % 10 == 0)
+            this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
+           
+            if ((this.timeoutCounter == 20))
             {
-                this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 2), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
+            	this.theMechanical.getNavigator().clearPathEntity();
+            }
+            if (this.timeoutCounter > 30)
+            {
+            	this.timeoutCounter = 0;
             }
        
         }

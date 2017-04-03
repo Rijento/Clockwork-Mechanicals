@@ -9,6 +9,7 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockFarmland;
+import net.minecraft.block.BlockStone;
 import net.minecraft.block.BlockWorkbench;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.entity.EntityLivingBase;
@@ -110,6 +111,16 @@ public class ItemMechanicalConfigurator extends Item
 				return EnumActionResult.SUCCESS;
 			}
 			addOrder(pos,"chop",stack);
+	        return EnumActionResult.SUCCESS;
+		}
+		if (worldIn.getBlockState(pos).getBlock() instanceof BlockStone)
+		{
+			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			{
+				removeOrder(pos, "mine", stack);
+				return EnumActionResult.SUCCESS;
+			}
+			addOrder(pos,"mine",stack);
 	        return EnumActionResult.SUCCESS;
 		}
 		return EnumActionResult.PASS;

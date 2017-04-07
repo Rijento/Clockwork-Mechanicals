@@ -34,7 +34,6 @@ import net.rijento.clockwork_mechanicals.lib.Order;
 
 public class ItemMechanicalConfigurator extends Item
 {
-	public int current_task = 0;
 	public ItemMechanicalConfigurator()
 	{
 		this.setMaxStackSize(1);
@@ -70,7 +69,7 @@ public class ItemMechanicalConfigurator extends Item
 		else if (hand == EnumHand.MAIN_HAND)
 		{
 			ItemStack stack = player.getHeldItemMainhand();
-			if (this.current_task == 1){
+			if (loadCurrentTask(stack) == 1){
 				if (worldIn.getBlockState(pos).getBlock() instanceof BlockCrops)
 				{
 					if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
@@ -89,7 +88,7 @@ public class ItemMechanicalConfigurator extends Item
 				addOrder(pos,"harvest",stack);
 		        return EnumActionResult.SUCCESS;
 			}
-			else if (this.current_task == 2)
+			else if (loadCurrentTask(stack) == 2)
 			{
 				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 				{
@@ -186,7 +185,10 @@ public class ItemMechanicalConfigurator extends Item
 		if(!orders.isEmpty())
 		{
 			Order toRemove = new Order(pos, command);
-			stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).removeTag((orders.indexOf(toRemove)));
+			if (orders.contains(toRemove))
+			{
+				stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).removeTag((orders.indexOf(toRemove)));
+			}
 		}
 	}
 	public List<Order> getOrders(ItemStack stack)
@@ -204,20 +206,25 @@ public class ItemMechanicalConfigurator extends Item
 		}
 		return orders;
 	}
-	public void setCurrentTask(int value)
+	public void setCurrentTask(ItemStack stack, int value)
 	{
-		System.out.println("set: "+value);
-		this.current_task = value;
-		
+		if (!stack.hasTagCompound())
+		{
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setTag("Orders", new NBTTagList());
+			stack.getTagCompound().setInteger("current_task", 0);
+		}
+		stack.getTagCompound().setInteger("current_task", value);
 	}
-	public void SaveCurrent(ItemStack stack)
+	public int loadCurrentTask(ItemStack stack)
 	{
-		stack.getTagCompound().setInteger("current_task", this.current_task);
-	}
-	
-	public void loadCurrentTask(ItemStack stack)
-	{
-		this.current_task = stack.getTagCompound().getInteger("current_task");
+		if (!stack.hasTagCompound())
+		{
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setTag("Orders", new NBTTagList());
+			stack.getTagCompound().setInteger("current_task", 0);
+		}
+		return stack.getTagCompound().getInteger("current_task");
 	}
 	public int getNumOrders(ItemStack stack)
 	{

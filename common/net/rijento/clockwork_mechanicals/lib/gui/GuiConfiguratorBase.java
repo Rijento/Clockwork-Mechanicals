@@ -26,7 +26,7 @@ public class GuiConfiguratorBase extends GuiContainer
 	
 	public GuiConfiguratorBase(InventoryPlayer inventory, ItemStack configuratorIn, World worldIn)
 	{
-		super(new ContainerConfigurator(inventory));
+		super(new ContainerConfigurator(inventory, configuratorIn));
 		this.configuratorStack = configuratorIn;
 		this.selected = configuratorStack.getTagCompound().getInteger("current_task");
 		this.xSize = 178;
@@ -73,12 +73,12 @@ public class GuiConfiguratorBase extends GuiContainer
     {
 		if (parButton == buttonHarvest)
 		{
-			((ItemMechanicalConfigurator)configuratorStack.getItem()).setCurrentTask(1);
+			((ContainerConfigurator)this.inventorySlots).current_task = 1;
 			selected = 1;
 		}
 		else if (parButton == buttonChop)
 		{
-			((ItemMechanicalConfigurator)configuratorStack.getItem()).setCurrentTask(2);
+			((ContainerConfigurator)this.inventorySlots).current_task = 2;
 			selected = 2;
 		}
     }

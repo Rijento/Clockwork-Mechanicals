@@ -287,6 +287,104 @@ public class MechanicalEventsClient
 	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spriteDown.getInterpolatedU(16), spriteDown.getInterpolatedV(16)).endVertex();
 	                tessellator.draw();
 	                continue;
+	            case("mine"):
+	            	TextureAtlasSprite spritePick = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:items/diamond_pickaxe");
+	            	spriteDown = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/stone");
+	            	spriteEast = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/stone");
+	            	spriteNorth = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/stone");
+	            	spriteSouth = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/stone");
+	            	spriteUp = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/stone");
+	            	spriteWest = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/stone");
+	            	
+	            
+	                boundingBox = new AxisAlignedBB(renderX, renderY, renderZ, renderX + 1, renderY + 1, renderZ + 1).expand(-0.2, -0.2, -0.2);
+	                //Up
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spriteUp.getInterpolatedU(16), spriteUp.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).tex(spriteUp.getInterpolatedU(16), spriteUp.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).tex(spriteUp.getInterpolatedU(0), spriteUp.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).tex(spriteUp.getInterpolatedU(0), spriteUp.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                
+	                //North
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).tex(spriteNorth.getInterpolatedU(16), spriteNorth.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).tex(spriteNorth.getInterpolatedU(0), spriteNorth.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).tex(spriteNorth.getInterpolatedU(0), spriteNorth.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).tex(spriteNorth.getInterpolatedU(16), spriteNorth.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                
+	                //East
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).tex(spriteEast.getInterpolatedU(16), spriteEast.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).tex(spriteEast.getInterpolatedU(16), spriteEast.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spriteEast.getInterpolatedU(0), spriteEast.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spriteEast.getInterpolatedU(0), spriteEast.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.minZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                
+	                //south
+	               
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).tex(spriteSouth.getInterpolatedU(0), spriteSouth.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spriteSouth.getInterpolatedU(16), spriteSouth.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spriteSouth.getInterpolatedU(16), spriteSouth.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).tex(spriteSouth.getInterpolatedU(0), spriteSouth.getInterpolatedV(0)).endVertex();
+	                tessellator.draw();
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(0)).endVertex();
+	                tessellator.draw();
+	                
+	                //west
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).tex(spriteWest.getInterpolatedU(16), spriteWest.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).tex(spriteWest.getInterpolatedU(16), spriteWest.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).tex(spriteWest.getInterpolatedU(0), spriteWest.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).tex(spriteWest.getInterpolatedU(0), spriteWest.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.minZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                
+	                //Down
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).tex(spriteDown.getInterpolatedU(0), spriteDown.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).tex(spriteDown.getInterpolatedU(0), spriteDown.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).tex(spriteDown.getInterpolatedU(16), spriteDown.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spriteDown.getInterpolatedU(16), spriteDown.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(16)).endVertex();
+	                buffer.pos(boundingBox.minX, boundingBox.minY, boundingBox.minZ).tex(spritePick.getInterpolatedU(0), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.minZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(0)).endVertex();
+	                buffer.pos(boundingBox.maxX, boundingBox.minY, boundingBox.maxZ).tex(spritePick.getInterpolatedU(16), spritePick.getInterpolatedV(16)).endVertex();
+	                tessellator.draw();
+	                
+	                Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+	                continue;
                 }
             }
 		}

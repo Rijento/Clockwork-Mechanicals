@@ -19,6 +19,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -61,13 +62,19 @@ public class ItemMechanicalConfigurator extends Item
 		return false;
 	}
 	@Override
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
+    {
+		if (!worldIn.isRemote && playerIn.isSneaking() && handIn == EnumHand.MAIN_HAND){
+			playerIn.openGui(ClockworkMechanicals.instance, 0, worldIn, playerIn.getPosition().getX(), playerIn.getPosition().getY(), playerIn.getPosition().getZ());
+			return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
+		}
+        return new ActionResult(EnumActionResult.PASS, playerIn.getHeldItem(handIn));
+    }
+	
+	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-		if (!worldIn.isRemote && player.isSneaking() && hand == EnumHand.MAIN_HAND){
-			player.openGui(ClockworkMechanicals.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
-			return EnumActionResult.SUCCESS;
-		}
-		else if (!worldIn.isRemote && hand == EnumHand.MAIN_HAND)
+		if (!worldIn.isRemote && hand == EnumHand.MAIN_HAND)
 		{
 			ItemStack stack = player.getHeldItemMainhand();
 			loadCurrentTask(stack);
@@ -98,6 +105,29 @@ public class ItemMechanicalConfigurator extends Item
 					return EnumActionResult.SUCCESS;
 				}
 				addOrder(pos,"chop",stack);
+		        return EnumActionResult.SUCCESS;
+			}
+			else if (this.current_task == 4)
+			{
+				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+				{
+					removeOrder(pos, "mine", stack);
+					return EnumActionResult.SUCCESS;
+				}
+				Order mine = new Order(pos,"mine");
+				mine.setFacing(facing.getOpposite());
+				addOrder(mine, stack);
+				
+		        return EnumActionResult.SUCCESS;
+			}
+			else if (this.current_task == 6)
+			{
+				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+				{
+					removeOrder(pos, "dropoff", stack);
+					return EnumActionResult.SUCCESS;
+				}
+				addOrder(pos,"dropoff",stack);
 		        return EnumActionResult.SUCCESS;
 			}
 		}

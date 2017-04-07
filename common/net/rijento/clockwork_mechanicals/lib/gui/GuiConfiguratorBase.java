@@ -73,12 +73,12 @@ public class GuiConfiguratorBase extends GuiContainer
     {
 		if (parButton == buttonHarvest)
 		{
-			((ContainerConfigurator)this.inventorySlots).current_task = 1;
+			((ItemMechanicalConfigurator)configuratorStack.getItem()).current_task = 1;
 			selected = 1;
 		}
 		else if (parButton == buttonChop)
 		{
-			((ContainerConfigurator)this.inventorySlots).current_task = 2;
+			((ItemMechanicalConfigurator)configuratorStack.getItem()).current_task = 2;
 			selected = 2;
 		}
     }

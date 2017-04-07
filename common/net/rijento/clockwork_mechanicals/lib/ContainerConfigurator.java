@@ -38,8 +38,7 @@ public class ContainerConfigurator extends Container
 	public void onContainerClosed(EntityPlayer playerIn)
     {
 		super.onContainerClosed(playerIn);
-		((ItemMechanicalConfigurator)configuratorStack.getItem()).setCurrentTask(configuratorStack,current_task);
-		System.out.println("out: " + this.current_task);
+		((ItemMechanicalConfigurator)configuratorStack.getItem()).saveCurrentTask(configuratorStack);
     }
 
 }

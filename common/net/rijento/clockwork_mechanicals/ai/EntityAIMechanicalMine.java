@@ -192,7 +192,7 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		World world = this.theMechanical.getEntityWorld();
 		BlockPos pos = this.theMechanical.getPosition();
 		double blocks = Math.floor(Math.sqrt(this.theMechanical.getDistanceSq(this.start)));
-		if (((blocks + 10) * 0.1D) >= this.theMechanical.getTension()){return true;}
+		if (((blocks + 10) * 0.25D) >= this.theMechanical.getTension()){return true;}
 		else if(blocks >= 100){return true;}
 		else{return false;}
 	}

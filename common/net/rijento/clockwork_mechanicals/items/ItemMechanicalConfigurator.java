@@ -28,11 +28,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
 public class ItemMechanicalConfigurator extends Item
 {
+	public int current_task = 0;
 	public ItemMechanicalConfigurator()
 	{
 		this.setMaxStackSize(1);
@@ -61,71 +63,87 @@ public class ItemMechanicalConfigurator extends Item
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-		ItemStack stack = player.getHeldItem(hand);
-		if (worldIn.getBlockState(pos).getBlock() instanceof BlockCrops)
-		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-			{
-				removeOrder(pos.down(), "harvest", stack);
-				return EnumActionResult.SUCCESS;
-			}
-			addOrder(pos.down(),"harvest",stack);
+		if (player.isSneaking() && hand == EnumHand.MAIN_HAND){
+			player.openGui(ClockworkMechanicals.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
 			return EnumActionResult.SUCCESS;
 		}
-		
-		if (worldIn.getBlockState(pos).getBlock() instanceof BlockChest)
+		else if (hand == EnumHand.MAIN_HAND)
 		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-			{
-				removeOrder(pos, "dropoff", stack);
-				return EnumActionResult.SUCCESS;
+			ItemStack stack = player.getHeldItemMainhand();
+			if (this.current_task == 1){
+				if (worldIn.getBlockState(pos).getBlock() instanceof BlockCrops)
+				{
+					if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+					{
+						removeOrder(pos.down(), "harvest", stack);
+						return EnumActionResult.SUCCESS;
+					}
+					addOrder(pos.down(),"harvest",stack);
+					return EnumActionResult.SUCCESS;
+				}
+				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+				{
+					removeOrder(pos, "harvest", stack);
+					return EnumActionResult.SUCCESS;
+				}
+				addOrder(pos,"harvest",stack);
+		        return EnumActionResult.SUCCESS;
 			}
-			addOrder(pos,"dropoff",stack);
-	        return EnumActionResult.SUCCESS;
-		}
-		if (worldIn.getBlockState(pos).getBlock() instanceof BlockFarmland)
-		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			else if (this.current_task == 2)
 			{
-				removeOrder(pos, "harvest", stack);
-				return EnumActionResult.SUCCESS;
+				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+				{
+					removeOrder(pos, "chop", stack);
+					return EnumActionResult.SUCCESS;
+				}
+				addOrder(pos,"chop",stack);
+		        return EnumActionResult.SUCCESS;
 			}
-			addOrder(pos,"harvest",stack);
-	        return EnumActionResult.SUCCESS;
 		}
-		if (worldIn.getBlockState(pos).getBlock() instanceof BlockWorkbench)
-		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-			{
-				removeOrder(pos, "craft", stack);
-				return EnumActionResult.SUCCESS;
-			}
-			addOrder(pos,"craft",stack);
-	        return EnumActionResult.SUCCESS;
-		}
-		if (worldIn.getBlockState(pos) ==Blocks.DIRT.getDefaultState().withProperty(PropertyEnum.<BlockDirt.DirtType>create("variant", BlockDirt.DirtType.class), BlockDirt.DirtType.byMetadata(BlockDirt.DirtType.COARSE_DIRT.getMetadata())))
-		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-			{
-				removeOrder(pos, "chop", stack);
-				return EnumActionResult.SUCCESS;
-			}
-			addOrder(pos,"chop",stack);
-	        return EnumActionResult.SUCCESS;
-		}
-		if (worldIn.getBlockState(pos).getBlock() instanceof BlockStone)
-		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-			{
-				removeOrder(pos, "mine", stack);
-				return EnumActionResult.SUCCESS;
-			}
-			Order mine = new Order(pos,"mine");
-			mine.setFacing(facing.getOpposite());
-			addOrder(mine, stack);
-			
-	        return EnumActionResult.SUCCESS;
-		}
+//		if (worldIn.getBlockState(pos).getBlock() instanceof BlockChest)
+//		{
+//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+//			{
+//				removeOrder(pos, "dropoff", stack);
+//				return EnumActionResult.SUCCESS;
+//			}
+//			addOrder(pos,"dropoff",stack);
+//	        return EnumActionResult.SUCCESS;
+//		}
+//		
+//		if (worldIn.getBlockState(pos).getBlock() instanceof BlockWorkbench)
+//		{
+//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+//			{
+//				removeOrder(pos, "craft", stack);
+//				return EnumActionResult.SUCCESS;
+//			}
+//			addOrder(pos,"craft",stack);
+//	        return EnumActionResult.SUCCESS;
+//		}
+//		if (worldIn.getBlockState(pos) ==Blocks.DIRT.getDefaultState().withProperty(PropertyEnum.<BlockDirt.DirtType>create("variant", BlockDirt.DirtType.class), BlockDirt.DirtType.byMetadata(BlockDirt.DirtType.COARSE_DIRT.getMetadata())))
+//		{
+//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+//			{
+//				removeOrder(pos, "chop", stack);
+//				return EnumActionResult.SUCCESS;
+//			}
+//			addOrder(pos,"chop",stack);
+//	        return EnumActionResult.SUCCESS;
+//		}
+//		if (worldIn.getBlockState(pos).getBlock() instanceof BlockStone)
+//		{
+//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+//			{
+//				removeOrder(pos, "mine", stack);
+//				return EnumActionResult.SUCCESS;
+//			}
+//			Order mine = new Order(pos,"mine");
+//			mine.setFacing(facing.getOpposite());
+//			addOrder(mine, stack);
+//			
+//	        return EnumActionResult.SUCCESS;
+//		}
 		return EnumActionResult.PASS;
 		
     }
@@ -152,6 +170,7 @@ public class ItemMechanicalConfigurator extends Item
 		{
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
+			stack.getTagCompound().setInteger("current_task", 0);
 		}
 		Order toAdd = order;
 		NBTTagCompound toAddNBT = toAdd.getOrderNBT();
@@ -176,6 +195,7 @@ public class ItemMechanicalConfigurator extends Item
 		{
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
+			stack.getTagCompound().setInteger("current_task", 0);
 		}
 		List<Order> orders = new ArrayList<Order>();
 		for(int i = 0; i < stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).tagCount(); i++)
@@ -184,12 +204,28 @@ public class ItemMechanicalConfigurator extends Item
 		}
 		return orders;
 	}
+	public void setCurrentTask(int value)
+	{
+		System.out.println("set: "+value);
+		this.current_task = value;
+		
+	}
+	public void SaveCurrent(ItemStack stack)
+	{
+		stack.getTagCompound().setInteger("current_task", this.current_task);
+	}
+	
+	public void loadCurrentTask(ItemStack stack)
+	{
+		this.current_task = stack.getTagCompound().getInteger("current_task");
+	}
 	public int getNumOrders(ItemStack stack)
 	{
 		if (!stack.hasTagCompound())
 		{
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
+			stack.getTagCompound().setInteger("current_task", 0);
 		}
 		return stack.getTagCompound().getTagList("Orders", Constants.NBT.TAG_COMPOUND).tagCount();
 	}

@@ -48,11 +48,13 @@ public class EntityMechanicalWorker extends EntityGolem
 	public List<Order> orders;
 	public List<FilterBase> filters = new ArrayList<FilterBase>();
 	public boolean isWinding = false;
-	private ItemMainspring Mainspring;
+	private ItemStack Mainspring;
 	private int currentTask;
 	private final InventoryBasic workerInventory;
 	private float tension;
 	private float maxTension;
+	private float moveSpeed;
+	private float windingCost;
 	
 	public EntityMechanicalWorker(World worldIn) {
 		super(worldIn);
@@ -71,7 +73,7 @@ public class EntityMechanicalWorker extends EntityGolem
     {
 		if (this.Mainspring != null)
 		{
-			return 0.25F * this.getMainspring().getResistance();
+			return 0.25F * ItemMainspring.getResistance(this.Mainspring.getItemDamage());
 		}
 		else{return 0.0f;}
     }
@@ -102,20 +104,21 @@ public class EntityMechanicalWorker extends EntityGolem
         }
     
     }
-	public ItemMainspring getMainspring()
+	public ItemStack getMainspring()
 	{
 		return this.Mainspring;
 	}
 	
-	public void setMainspring(ItemMainspring MainspringIn)
+	public void setMainspring(ItemStack MainspringIn)
 	{
-		if (this.Mainspring instanceof ItemMainspring && !this.world.isRemote)
+		if (this.Mainspring != null && !this.world.isRemote)
 		{
-			this.dropItem(this.Mainspring, 1);
+			this.entityDropItem(this.Mainspring, 0.5F);
 		}
 		this.Mainspring = MainspringIn;
-		this.maxTension = MainspringIn.getMaxTension();
-		this.setAIMoveSpeed(0.25F * MainspringIn.getResistance());
+		this.maxTension = ItemMainspring.getMaxTension(MainspringIn.getItemDamage());
+		this.windingCost = ItemMainspring.getWindingCost(MainspringIn.getItemDamage());
+		this.setAIMoveSpeed(0.25F * ItemMainspring.getResistance(MainspringIn.getItemDamage()));
 	}
 	
 	public void SetOrders(List<Order> ordersIn, boolean load)
@@ -205,7 +208,7 @@ public class EntityMechanicalWorker extends EntityGolem
 	 public void writeEntityToNBT(NBTTagCompound compound)
     {
         super.writeEntityToNBT(compound);
-        compound.setTag("Mainspring", new ItemStack(this.Mainspring).writeToNBT(new NBTTagCompound()));
+        compound.setTag("Mainspring", this.Mainspring.writeToNBT(new NBTTagCompound()));
         compound.setFloat("Tension", this.tension);
         compound.setInteger("currentTask", this.currentTask);
         
@@ -236,11 +239,10 @@ public class EntityMechanicalWorker extends EntityGolem
 	public void readEntityFromNBT(NBTTagCompound compound)
 	{
 		super.readEntityFromNBT(compound);
-        ItemStack mainspringStack = new ItemStack(compound.getCompoundTag("Mainspring"));
-        Item MainIn = mainspringStack.getItem();
-        if (MainIn instanceof ItemMainspring)
+        ItemStack MainIn = new ItemStack(compound.getCompoundTag("Mainspring"));
+        if (MainIn.getItem() instanceof ItemMainspring)
         {
-        	this.setMainspring((ItemMainspring)MainIn);
+        	this.setMainspring(MainIn);
         }
         this.tension = compound.getFloat("Tension");
         this.currentTask = compound.getInteger("currentTask");
@@ -281,9 +283,9 @@ public class EntityMechanicalWorker extends EntityGolem
 	public void wind(float rate)
 	{
 		if (this.Mainspring != null){			
-			if (this.tension + rate/this.Mainspring.getWindingCost() <= this.maxTension)
+			if (this.tension + rate/this.windingCost <= this.maxTension)
 			{
-				this.tension += (rate/this.Mainspring.getWindingCost());
+				this.tension += (rate/this.windingCost);
 				this.isWinding = true;
 			}
 			if (world.isRemote){System.out.println("Client: " + this.tension);}
@@ -326,7 +328,7 @@ public class EntityMechanicalWorker extends EntityGolem
 		InventoryHelper.dropInventoryItems(this.world, this.getPosition(), this.workerInventory);
 		if (!this.world.isRemote)
 		{
-			this.dropItem(this.Mainspring, 1);
+			this.entityDropItem(this.Mainspring, 0.5F);
 		}
 	}
 }

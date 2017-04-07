@@ -63,7 +63,7 @@ public class ItemMainspring extends Item
 	{
 		if (entity instanceof EntityMechanicalWorker)
 		{
-			((EntityMechanicalWorker) entity).setMainspring(this);
+			((EntityMechanicalWorker) entity).setMainspring(player.getHeldItem(hand));
 			itemstack.setCount(0);
 			
 			return true;
@@ -71,24 +71,24 @@ public class ItemMainspring extends Item
 		return false;
 	}
 	
-	public float getResistance()
+	public static float getResistance(int typeIn)
 	{
-		ItemMainspringType type = ITEM_VARIANTS[new ItemStack(this).getItemDamage()];
+		ItemMainspringType type = ITEM_VARIANTS[typeIn];
 		return type.getResistance();
 	}
-	public float getFlexability()
+	public static float getFlexability(int typeIn)
 	{
-		ItemMainspringType type = ITEM_VARIANTS[new ItemStack(this).getItemDamage()];
+		ItemMainspringType type = ITEM_VARIANTS[typeIn];
 		return type.getFlexability();
 	}
-	public float getWindingCost()
+	public static float getWindingCost(int typeIn)
 	{
-		ItemMainspringType type = ITEM_VARIANTS[new ItemStack(this).getItemDamage()];
+		ItemMainspringType type = ITEM_VARIANTS[typeIn];
 		return type.getWindingCost();
 	}
-	public float getMaxTension()
+	public static float getMaxTension(int typeIn)
 	{
-		ItemMainspringType type = ITEM_VARIANTS[new ItemStack(this).getItemDamage()];
+		ItemMainspringType type = ITEM_VARIANTS[typeIn];
 		return type.getMaxTension();
 	}
 	

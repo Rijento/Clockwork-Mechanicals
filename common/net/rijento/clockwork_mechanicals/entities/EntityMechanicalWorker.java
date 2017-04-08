@@ -46,10 +46,12 @@ public class EntityMechanicalWorker extends EntityGolem
 	private ItemStack Mainspring;
 	private int currentTask;
 	private final InventoryBasic workerInventory;
+	private float prevTension;
 	private float tension;
 	private float maxTension;
 	private float moveSpeed;
 	private float windingCost;
+	private int windingTimer;
 	
 	public EntityMechanicalWorker(World worldIn) {
 		super(worldIn);
@@ -76,12 +78,19 @@ public class EntityMechanicalWorker extends EntityGolem
 	@Override
 	public void onUpdate()
 	{
+		if (this.prevTension < this.tension){this.isWinding = true;}
+		else{this.isWinding = false;}
 		double d0 = this.posX - this.prevPosX;
         double d1 = this.posZ - this.prevPosZ;
         double f1 = d0 * d0 + d1 * d1;
         float distance = (float)Math.sqrt(f1);
         if (distance > 0.0F){this.unwind(0.25F * distance);}
 		super.onUpdate();
+		if (this.windingTimer <= 0)
+		{
+			this.prevTension = this.tension;
+		}
+		else{this.windingTimer--;}
 	}
 	
 	protected void updateEquipmentIfNeeded(EntityItem itemEntity)
@@ -112,6 +121,7 @@ public class EntityMechanicalWorker extends EntityGolem
 		}
 		this.Mainspring = MainspringIn;
 		this.tension = 0F;
+		this.prevTension = 0F;
 		this.maxTension = ItemMainspring.getMaxTension(MainspringIn.getItemDamage());
 		this.windingCost = ItemMainspring.getWindingCost(MainspringIn.getItemDamage());
 		this.setAIMoveSpeed(0.25F * ItemMainspring.getResistance(MainspringIn.getItemDamage()));
@@ -247,6 +257,7 @@ public class EntityMechanicalWorker extends EntityGolem
         	this.setMainspring(MainIn);
         }
         this.tension = compound.getFloat("Tension");
+        this.prevTension = this.tension;
         this.currentTask = compound.getInteger("currentTask");
         
         NBTTagList nbttaglist = compound.getTagList("Inventory", Constants.NBT.TAG_COMPOUND);
@@ -288,12 +299,11 @@ public class EntityMechanicalWorker extends EntityGolem
 			if (this.tension + rate/this.windingCost <= this.maxTension)
 			{
 				this.tension += (rate/this.windingCost);
-				this.isWinding = true;
+				this.windingTimer = 5;
 			}
 			if (world.isRemote){System.out.println("Client: " + this.tension);}
 			else{System.out.println("Server: " + this.tension);}
 		}
-		this.isWinding = false;
 	}
 	public void unwind(float amount)
 	{

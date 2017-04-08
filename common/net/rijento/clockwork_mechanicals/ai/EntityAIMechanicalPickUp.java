@@ -2,34 +2,35 @@ package net.rijento.clockwork_mechanicals.ai;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
 import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
-import net.rijento.clockwork_mechanicals.lib.filter.Whitelist;
 
 public class EntityAIMechanicalPickUp extends EntityAIBase {
 	private final EntityMechanicalWorker theMechanical;
 	private final int priority;
-	private final BlockPos targetChest;
+	private final BlockPos targetInventory;
 	private final static int maxruntime = 100;
 	private int runtime;
 	private boolean fullyempty = true;
 	private int transferTime;
 	
-	public EntityAIMechanicalPickUp( EntityMechanicalWorker theMechanicalIn, BlockPos chestIn, int priorityIn)
+	public EntityAIMechanicalPickUp( EntityMechanicalWorker theMechanicalIn, BlockPos InventoryIn, int priorityIn)
 	{
 		this.theMechanical = theMechanicalIn;
-		this.targetChest = chestIn;
+		this.targetInventory = InventoryIn;
 		this.priority = priorityIn;
 		if (!this.theMechanical.world.isRemote)
 		{
-			this.transferTime = (int)(10 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
+			this.transferTime = (int)(8 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
 		}
 	}
 	@Override
@@ -80,19 +81,20 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	@Override
 	public void updateTask()
     {
-		Block block = this.theMechanical.getEntityWorld().getBlockState(targetChest).getBlock();
-		if (!(block instanceof BlockChest) || this.theMechanical.getDistanceSqToCenter(this.targetChest) > 3.0D){return;}
+		TileEntity te = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
+		if (!(te instanceof IInventory)){this.runtime++; return;}
+		else if (this.theMechanical.getDistanceSqToCenter(this.targetInventory) > 3.0D){return;}
 		else
 		{
-			IInventory chestInventory = ((BlockChest)block).getContainer(this.theMechanical.getEntityWorld(), this.targetChest, true);
+			IInventory InventoryIn = ((IInventory)te);
 			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
-			int size = chestInventory.getSizeInventory();
+			int size = InventoryIn.getSizeInventory();
 			for (int i = 0; i < size; ++i)
             {
-                if (!chestInventory.getStackInSlot(i).isEmpty() && this.runtime % this.transferTime == 0)
+                if (!InventoryIn.getStackInSlot(i).isEmpty() && this.runtime % this.transferTime == 0 && this.runtime != 0)
                 {
-                    ItemStack itemstack = chestInventory.getStackInSlot(i);
-                    Item item = chestInventory.getStackInSlot(i).getItem();
+                    ItemStack itemstack = InventoryIn.getStackInSlot(i);
+                    Item item = InventoryIn.getStackInSlot(i).getItem();
                     int flag = 1;
                     for (FilterBase filter : this.theMechanical.filters)
                     {
@@ -104,14 +106,15 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
                     }
                     if (!(flag == 0))
                     {
-	                    ItemStack itemstack1 = putStackInInventoryAllSlots(chestInventory, mechainicalInventory, new ItemStack(item, 1, itemstack.getMetadata()));
+	                    ItemStack itemstack1 = putStackInInventoryAllSlots(InventoryIn, mechainicalInventory, new ItemStack(item, 1, itemstack.getMetadata()));
 	                    
 	                    if (itemstack1.isEmpty())
 	                    {
 	                    	itemstack.shrink(1);
 	                    	this.theMechanical.unwind(0.05F);
-	                        chestInventory.markDirty();
+	                    	InventoryIn.markDirty();
 	                        mechainicalInventory.markDirty();
+	                        this.runtime = 0;
 	                        break;
 	                    }
                     }
@@ -120,30 +123,30 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 			this.runtime++;
 		}
     }
-	private ItemStack putStackInInventoryAllSlots(IInventory mechainicalInventory, IInventory chestInventory, ItemStack itemStack)
+	private ItemStack putStackInInventoryAllSlots(IInventory InventoryIn, IInventory  mechainicalInventory, ItemStack itemStack)
 	{
-		int i = chestInventory.getSizeInventory();
+		int i =  mechainicalInventory.getSizeInventory();
 
         for (int j = 0; j < i && !itemStack.isEmpty(); ++j)
         {
-            itemStack = insertStack(mechainicalInventory, chestInventory, itemStack, j);
+            itemStack = insertStack(InventoryIn,  mechainicalInventory, itemStack, j);
         }
 		return itemStack;
 	}
-	private ItemStack insertStack(IInventory mechainicalInventory, IInventory chestInventory, ItemStack itemStack, int slot)
+	private ItemStack insertStack(IInventory InventoryIn, IInventory  mechainicalInventory, ItemStack itemStack, int slot)
 	{
-		ItemStack cheststack = chestInventory.getStackInSlot(slot);
-		if (cheststack.isEmpty())
+		ItemStack mechanicalstack =  mechainicalInventory.getStackInSlot(slot);
+		if (mechanicalstack.isEmpty())
         {
-            chestInventory.setInventorySlotContents(slot, itemStack);
+			mechainicalInventory.setInventorySlotContents(slot, itemStack);
             itemStack = ItemStack.EMPTY;
         }
-        else if (canCombine(cheststack, itemStack))
+        else if (canCombine(mechanicalstack, itemStack))
         {
-            int i = itemStack.getMaxStackSize() - cheststack.getCount();
+            int i = itemStack.getMaxStackSize() - mechanicalstack.getCount();
             int j = Math.min(itemStack.getCount(), i);
             itemStack.shrink(j);
-            cheststack.grow(j);
+            mechanicalstack.grow(j);
         }
 		
 		return itemStack;

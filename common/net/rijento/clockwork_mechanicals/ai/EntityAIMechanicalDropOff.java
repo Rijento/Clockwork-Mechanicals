@@ -6,6 +6,7 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
@@ -17,20 +18,20 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 {
 	private final EntityMechanicalWorker theMechanical;
 	private final int priority;
-	private final BlockPos targetChest;
+	private final BlockPos targetInventory;
 	private final static int maxruntime = 100;
 	private int runtime;
 	private boolean fullyempty = true;
 	private int transferTime;
 	
-	public EntityAIMechanicalDropOff( EntityMechanicalWorker theMechanicalIn, BlockPos chestIn, int priorityIn)
+	public EntityAIMechanicalDropOff( EntityMechanicalWorker theMechanicalIn, BlockPos InventoryIn, int priorityIn)
 	{
 		this.theMechanical = theMechanicalIn;
-		this.targetChest = chestIn;
+		this.targetInventory = InventoryIn;
 		this.priority = priorityIn;
 		if (!this.theMechanical.world.isRemote)
 		{
-			this.transferTime = (int)(10 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
+			this.transferTime = (int)(8 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
 		}
 	}
 	@Override
@@ -75,11 +76,12 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	@Override
 	public void updateTask()
     {
-		Block block = this.theMechanical.getEntityWorld().getBlockState(targetChest).getBlock();
-		if (!(block instanceof BlockChest) || this.theMechanical.getDistanceSqToCenter(this.targetChest) > 3.0D){return;}
+		TileEntity te = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
+		if (!(te instanceof IInventory)){this.runtime++; return;}
+		else if (this.theMechanical.getDistanceSqToCenter(this.targetInventory) > 3.0D){return;}
 		else
 		{
-			IInventory chestInventory = ((BlockChest)block).getContainer(this.theMechanical.getEntityWorld(), this.targetChest, true);
+			IInventory InventoryOut = ((IInventory)te);
 			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
 			int size = this.theMechanical.getMechanicalInventory().getSizeInventory();
 			for (int i = 0; i < size; ++i)
@@ -100,13 +102,13 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                     }
                     if (!(flag == 0))
                     {
-	                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, chestInventory, new ItemStack(item, 1, itemstack.getMetadata()));
+	                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, InventoryOut, new ItemStack(item, 1, itemstack.getMetadata()));
 	                    
 	                    if (itemstack1.isEmpty())
 	                    {
 	                    	itemstack.shrink(1);
 	                    	this.theMechanical.unwind(0.05F);
-	                        chestInventory.markDirty();
+	                    	InventoryOut.markDirty();
 	                        break;
 	                    }
                     }
@@ -115,30 +117,30 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 			this.runtime++;
 		}
     }
-	private ItemStack putStackInInventoryAllSlots(IInventory mechainicalInventory, IInventory chestInventory, ItemStack itemStack)
+	private ItemStack putStackInInventoryAllSlots(IInventory mechainicalInventory, IInventory InventoryOut, ItemStack itemStack)
 	{
-		int i = chestInventory.getSizeInventory();
+		int i = InventoryOut.getSizeInventory();
 
         for (int j = 0; j < i && !itemStack.isEmpty(); ++j)
         {
-            itemStack = insertStack(mechainicalInventory, chestInventory, itemStack, j);
+            itemStack = insertStack(mechainicalInventory, InventoryOut, itemStack, j);
         }
 		return itemStack;
 	}
-	private ItemStack insertStack(IInventory mechainicalInventory, IInventory chestInventory, ItemStack itemStack, int slot)
+	private ItemStack insertStack(IInventory mechainicalInventory, IInventory InventoryOut, ItemStack itemStack, int slot)
 	{
-		ItemStack cheststack = chestInventory.getStackInSlot(slot);
-		if (cheststack.isEmpty())
+		ItemStack inventorystack = InventoryOut.getStackInSlot(slot);
+		if (inventorystack.isEmpty())
         {
-            chestInventory.setInventorySlotContents(slot, itemStack);
+			InventoryOut.setInventorySlotContents(slot, itemStack);
             itemStack = ItemStack.EMPTY;
         }
-        else if (canCombine(cheststack, itemStack))
+        else if (canCombine(inventorystack, itemStack))
         {
-            int i = itemStack.getMaxStackSize() - cheststack.getCount();
+            int i = itemStack.getMaxStackSize() - inventorystack.getCount();
             int j = Math.min(itemStack.getCount(), i);
             itemStack.shrink(j);
-            cheststack.grow(j);
+            inventorystack.grow(j);
         }
 		
 		return itemStack;

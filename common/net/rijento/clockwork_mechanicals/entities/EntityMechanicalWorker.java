@@ -209,7 +209,8 @@ public class EntityMechanicalWorker extends EntityGolem
 	 public void writeEntityToNBT(NBTTagCompound compound)
     {
         super.writeEntityToNBT(compound);
-        compound.setTag("Mainspring", this.Mainspring.writeToNBT(new NBTTagCompound()));
+        if (this.Mainspring != null){compound.setTag("Mainspring", this.Mainspring.writeToNBT(new NBTTagCompound()));}
+        else {compound.setTag("Mainspring", (new ItemStack(Items.AIR)).writeToNBT(new NBTTagCompound()));}
         compound.setFloat("Tension", this.tension);
         compound.setInteger("currentTask", this.currentTask);
         
@@ -327,7 +328,7 @@ public class EntityMechanicalWorker extends EntityGolem
 	{
 		super.onDeath(cause);
 		InventoryHelper.dropInventoryItems(this.world, this.getPosition(), this.workerInventory);
-		if (!this.world.isRemote)
+		if (!this.world.isRemote && this.Mainspring != null)
 		{
 			this.entityDropItem(this.Mainspring, 0.5F);
 		}

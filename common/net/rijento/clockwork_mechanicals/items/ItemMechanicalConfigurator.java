@@ -9,6 +9,8 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.BlockFarmland;
+import net.minecraft.block.BlockLog;
+import net.minecraft.block.BlockSapling;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.BlockWorkbench;
 import net.minecraft.block.properties.PropertyEnum;
@@ -36,7 +38,6 @@ import net.rijento.clockwork_mechanicals.lib.Order;
 public class ItemMechanicalConfigurator extends Item
 {
 	public int current_task = 0;
-	public boolean adding = false;
 	public ItemMechanicalConfigurator()
 	{
 		this.setMaxStackSize(1);
@@ -47,6 +48,7 @@ public class ItemMechanicalConfigurator extends Item
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
 		tooltip.add(TextFormatting.WHITE + "Number of orders: " + String.valueOf(this.getNumOrders(stack)));
+		tooltip.add(TextFormatting.WHITE + "L-Alt + Right-click to open GUI.");
 		tooltip.add(TextFormatting.WHITE + "Right-click to add order.");
 		tooltip.add(TextFormatting.WHITE + "Ctrl + right-click to remove order.");
 		tooltip.add(TextFormatting.WHITE + "Shift + right-click on mechanical to give orders.");
@@ -65,7 +67,7 @@ public class ItemMechanicalConfigurator extends Item
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
-		if (!worldIn.isRemote && playerIn.isSneaking() && handIn == EnumHand.MAIN_HAND && !adding){
+		if (!worldIn.isRemote && Keyboard.isKeyDown(Keyboard.KEY_LMENU) && handIn == EnumHand.MAIN_HAND){
 			playerIn.openGui(ClockworkMechanicals.instance, 0, worldIn, playerIn.getPosition().getX(), playerIn.getPosition().getY(), playerIn.getPosition().getZ());
 			return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}
@@ -75,7 +77,6 @@ public class ItemMechanicalConfigurator extends Item
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-		adding = true;
 		if (!worldIn.isRemote && hand == EnumHand.MAIN_HAND)
 		{
 			ItemStack stack = player.getHeldItemMainhand();
@@ -86,33 +87,47 @@ public class ItemMechanicalConfigurator extends Item
 					if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 					{
 						removeOrder(pos.down(), "harvest", stack);
-						adding = false;
 						return EnumActionResult.SUCCESS;
 					}
 					addOrder(pos.down(),"harvest",stack);
-					adding = false;
 					return EnumActionResult.SUCCESS;
 				}
 				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 				{
 					removeOrder(pos, "harvest", stack);
-					adding = false;
 					return EnumActionResult.SUCCESS;
 				}
 				addOrder(pos,"harvest",stack);
-				adding = false;
 		        return EnumActionResult.SUCCESS;
 			}
 			else if (this.current_task == 2)
 			{
+				if (worldIn.getBlockState(pos).getBlock() instanceof BlockSapling)
+				{
+					if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+					{
+						removeOrder(pos.down(), "chop", stack);
+						return EnumActionResult.SUCCESS;
+					}
+					addOrder(pos.down(),"chop",stack);
+					return EnumActionResult.SUCCESS;
+				}
+				if (worldIn.getBlockState(pos).getBlock() instanceof BlockLog)
+				{
+					if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+					{
+						removeOrder(pos.down(), "chop", stack);
+						return EnumActionResult.SUCCESS;
+					}
+					addOrder(pos.down(),"chop",stack);
+					return EnumActionResult.SUCCESS;
+				}
 				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 				{
 					removeOrder(pos, "chop", stack);
-					adding = false;
 					return EnumActionResult.SUCCESS;
 				}
 				addOrder(pos,"chop",stack);
-				adding = false;
 		        return EnumActionResult.SUCCESS;
 			}
 			else if (this.current_task == 4)
@@ -120,14 +135,22 @@ public class ItemMechanicalConfigurator extends Item
 				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 				{
 					removeOrder(pos, "mine", stack);
-					adding = false;
 					return EnumActionResult.SUCCESS;
 				}
 				Order mine = new Order(pos,"mine");
 				mine.setFacing(facing.getOpposite());
-				adding = false;
 				addOrder(mine, stack);
 				
+		        return EnumActionResult.SUCCESS;
+			}
+			else if (this.current_task == 5)
+			{
+				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+				{
+					removeOrder(pos, "pickup", stack);
+					return EnumActionResult.SUCCESS;
+				}
+				addOrder(pos,"pickup",stack);
 		        return EnumActionResult.SUCCESS;
 			}
 			else if (this.current_task == 6)
@@ -135,11 +158,9 @@ public class ItemMechanicalConfigurator extends Item
 				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
 				{
 					removeOrder(pos, "dropoff", stack);
-					adding = false;
 					return EnumActionResult.SUCCESS;
 				}
 				addOrder(pos,"dropoff",stack);
-				adding = false;
 		        return EnumActionResult.SUCCESS;
 			}
 		}
@@ -187,7 +208,6 @@ public class ItemMechanicalConfigurator extends Item
 //			
 //	        return EnumActionResult.SUCCESS;
 //		}
-		adding = false;
 		return EnumActionResult.PASS;
 		
     }

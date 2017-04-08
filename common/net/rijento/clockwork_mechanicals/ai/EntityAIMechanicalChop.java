@@ -9,6 +9,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
+import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 
 public class EntityAIMechanicalChop extends EntityAIBase
 {
@@ -17,6 +18,7 @@ public class EntityAIMechanicalChop extends EntityAIBase
 	private final int priority;
 	private int currentTask;
 	private int ticks;
+	private int workTime;
 	
 	public EntityAIMechanicalChop(EntityMechanicalWorker workerIn, BlockPos posIn, int priorityIn)
 	{
@@ -25,6 +27,10 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		this.priority = priorityIn;
 		this.currentTask = -1;
 		this.ticks = -1;
+		if (!this.theMechanical.world.isRemote)
+		{
+			this.workTime = (int)(30 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
+		}
 	}
 	
 	@Override
@@ -38,7 +44,7 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		else if (this.theMechanical.world.getBlockState(target).getBlock() instanceof BlockLog && this.theMechanical.getDistanceSqToCenter(this.target) <= 2.5D)
 		{
 			this.currentTask = 1;
-			if (this.ticks < 0){this.ticks = 100;}
+			if (this.ticks < 0){this.ticks = this.workTime * 5;}
 			return true;
 		}
 		else if (this.ticks >= 0){return true;}
@@ -52,7 +58,7 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		{
 			ItemStack itemstack = this.theMechanical.getMechanicalInventory().getStackInSlot(i);
 
-            if (!itemstack.isEmpty() && (ItemStack.areItemStackTagsEqual(itemstack, new ItemStack(Blocks.SAPLING))))
+            if (!itemstack.isEmpty() && (ItemStack.areItemsEqualIgnoreDurability(itemstack, new ItemStack(Blocks.SAPLING))))
             {
             	this.currentTask = 0;
                 return true;
@@ -67,7 +73,7 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		{
 			ItemStack itemstack = this.theMechanical.getMechanicalInventory().getStackInSlot(i);
 
-            if (!itemstack.isEmpty() && (ItemStack.areItemStackTagsEqual(itemstack, new ItemStack(Blocks.SAPLING))))
+            if (!itemstack.isEmpty() && (ItemStack.areItemsEqualIgnoreDurability(itemstack, new ItemStack(Blocks.SAPLING))))
             {
             	return this.theMechanical.getMechanicalInventory().decrStackSize(i, 1);
             }
@@ -85,9 +91,9 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		}
 		else
 		{
-			if (this.ticks % 20 == 0)
+			if (this.ticks % workTime == 0)
 			{
-				this.theMechanical.world.destroyBlock(target.up(this.ticks/20), true);
+				this.theMechanical.world.destroyBlock(target.up(this.ticks/workTime), true);
 				this.theMechanical.unwind(0.5f);
 			}
 			--this.ticks;

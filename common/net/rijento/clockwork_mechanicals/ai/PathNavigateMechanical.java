@@ -71,7 +71,7 @@ public class PathNavigateMechanical extends PathNavigate {
 
             if (blockpos.getY() > 0)
             {
-                return super.getPathToPos(blockpos.up());
+                return super.getPathToPos(blockpos);
             }
 
             while (blockpos.getY() < this.world.getHeight() && this.world.getBlockState(blockpos).getMaterial() == Material.AIR)
@@ -94,7 +94,6 @@ public class PathNavigateMechanical extends PathNavigate {
             {
                 ;
             }
-
             return super.getPathToPos(blockpos1);
         }
     }

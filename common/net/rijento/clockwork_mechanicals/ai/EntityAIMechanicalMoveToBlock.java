@@ -65,12 +65,12 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 	
 	public void updateTask()
     {
-        if (this.theMechanical.getDistanceSqToCenter(this.destinationBlock.up()) > 1.0D)
+        if (this.theMechanical.getDistanceSqToCenter(this.destinationBlock) > 2.0D)
         {
             this.isAboveDestination = false;
             ++this.timeoutCounter;
 
-            this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
+            this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY()), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
            
             if ((this.timeoutCounter < 10))
             {

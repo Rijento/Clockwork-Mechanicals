@@ -14,28 +14,23 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemSeedFood;
-import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalChop;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalCraft;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalDropOff;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalHarvestFarmland;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMine;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalPickUp;
 import net.rijento.clockwork_mechanicals.ai.PathNavigateMechanical;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.ContainerBasic;
@@ -116,6 +111,7 @@ public class EntityMechanicalWorker extends EntityGolem
 			this.entityDropItem(this.Mainspring, 0.5F);
 		}
 		this.Mainspring = MainspringIn;
+		this.tension = 0F;
 		this.maxTension = ItemMainspring.getMaxTension(MainspringIn.getItemDamage());
 		this.windingCost = ItemMainspring.getWindingCost(MainspringIn.getItemDamage());
 		this.setAIMoveSpeed(0.25F * ItemMainspring.getResistance(MainspringIn.getItemDamage()));
@@ -154,6 +150,11 @@ public class EntityMechanicalWorker extends EntityGolem
 				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskDropoff);
+				continue;
+			case "pickup":
+				EntityAIMechanicalPickUp taskPickup = new EntityAIMechanicalPickUp(this, order.pos, i);
+				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
+				this.tasks.addTask(i, taskPickup);
 				continue;
 			case "craft":
 				InventoryCrafting recipe = new InventoryCrafting(new ContainerBasic(), 3, 3);

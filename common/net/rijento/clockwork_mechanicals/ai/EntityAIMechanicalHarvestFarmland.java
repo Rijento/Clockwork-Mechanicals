@@ -112,8 +112,11 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
                 }
             }
         }
-        this.theMechanical.nextTask();
-        this.currentTask = -1;
+        if (this.theMechanical.getDistanceSqToCenter(this.position.up()) <= 0.6D && this.currentTask == -1)
+        {
+        	this.theMechanical.nextTask();
+        }
+       determineTask(world);
     }
     
     protected void determineTask(World worldIn)
@@ -129,13 +132,17 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
             if (block instanceof BlockCrops && ((BlockCrops)block).isMaxAge(iblockstate) &&  (this.currentTask == 0 || this.currentTask < 0))
             {
                 this.currentTask = 0;
+                return;
             }
 
             if (iblockstate.getMaterial() == Material.AIR && this.hasFarmItem && (this.currentTask == 1 || this.currentTask < 0))
             {
             	this.currentTask = 1;
+            	return;
             }
         }
+        this.currentTask = -1;
+        return;
     }
     public boolean isFarmItemInInventory()
     {

@@ -13,8 +13,7 @@ import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
 import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
 import net.rijento.clockwork_mechanicals.lib.filter.Whitelist;
 
-public class EntityAIMechanicalDropOff extends EntityAIBase
-{
+public class EntityAIMechanicalPickUp extends EntityAIBase {
 	private final EntityMechanicalWorker theMechanical;
 	private final int priority;
 	private final BlockPos targetChest;
@@ -23,7 +22,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	private boolean fullyempty = true;
 	private int transferTime;
 	
-	public EntityAIMechanicalDropOff( EntityMechanicalWorker theMechanicalIn, BlockPos chestIn, int priorityIn)
+	public EntityAIMechanicalPickUp( EntityMechanicalWorker theMechanicalIn, BlockPos chestIn, int priorityIn)
 	{
 		this.theMechanical = theMechanicalIn;
 		this.targetChest = chestIn;
@@ -36,7 +35,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	@Override
 	public boolean shouldExecute() {
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
-		else if (!(this.theMechanical.getTension()-0.15F>0)){return false;}
+		else if (!(this.theMechanical.getTension()-0.05F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
 		else
@@ -50,7 +49,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	{
 		if (this.fullyempty == true)
 		{
-			if (this.checkEmpty() == true)
+			if (this.checkFull() == true)
 			{
 				if (this.runtime >= this.maxruntime)
 				{
@@ -58,9 +57,15 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 					this.runtime = 0;
 					return false;
 				}
-				this.runtime++;
 			}
-			else{return true;}
+			else{
+				if (this.runtime >= this.maxruntime)
+				{
+					this.theMechanical.nextTask();
+					this.runtime = 0;
+					return false;
+				}
+			}
 		}
 		else if (this.runtime >= this.maxruntime)
 		{
@@ -81,32 +86,32 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		{
 			IInventory chestInventory = ((BlockChest)block).getContainer(this.theMechanical.getEntityWorld(), this.targetChest, true);
 			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
-			int size = this.theMechanical.getMechanicalInventory().getSizeInventory();
+			int size = chestInventory.getSizeInventory();
 			for (int i = 0; i < size; ++i)
             {
-                if (!mechainicalInventory.getStackInSlot(i).isEmpty() && this.runtime % this.transferTime == 0)
+                if (!chestInventory.getStackInSlot(i).isEmpty() && this.runtime % this.transferTime == 0)
                 {
-                    ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
-                    Item item = mechainicalInventory.getStackInSlot(i).getItem();
+                    ItemStack itemstack = chestInventory.getStackInSlot(i);
+                    Item item = chestInventory.getStackInSlot(i).getItem();
                     int flag = 1;
                     for (FilterBase filter : this.theMechanical.filters)
                     {
                     	if (filter instanceof KeepAmnt)
                     	{
-                    		
                     		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
                     		if (flag == 0){break;}
                     	}
                     }
                     if (!(flag == 0))
                     {
-	                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, chestInventory, new ItemStack(item, 1, itemstack.getMetadata()));
+	                    ItemStack itemstack1 = putStackInInventoryAllSlots(chestInventory, mechainicalInventory, new ItemStack(item, 1, itemstack.getMetadata()));
 	                    
 	                    if (itemstack1.isEmpty())
 	                    {
 	                    	itemstack.shrink(1);
 	                    	this.theMechanical.unwind(0.05F);
 	                        chestInventory.markDirty();
+	                        mechainicalInventory.markDirty();
 	                        break;
 	                    }
                     }
@@ -148,39 +153,16 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
         return stack1.getItem() != stack2.getItem() ? false : (stack1.getMetadata() != stack2.getMetadata() ? false : (stack1.getCount() > stack1.getMaxStackSize() ? false : ItemStack.areItemStackTagsEqual(stack1, stack2)));
     }
 	
-	private boolean checkEmpty()
+	private boolean checkFull()
 	{
-		if (this.theMechanical.getMechanicalInventory().isEmpty()){return true;}
-		if (this.theMechanical.filters.isEmpty())
+		for (int i = 0; i < this.theMechanical.getMechanicalInventory().getSizeInventory(); ++i)
 		{
-			return this.theMechanical.getMechanicalInventory().isEmpty();
-		}
-		else
-		{
-			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
-			int size = this.theMechanical.getMechanicalInventory().getSizeInventory();
-			for (int i = 0; i < size; ++i)
-            {
-                if (!mechainicalInventory.getStackInSlot(i).isEmpty())
-                {
-                    ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
-                    int flag = 1;
-                    for (FilterBase filter : this.theMechanical.filters)
-                    {
-                    	if (filter instanceof KeepAmnt)
-                    	{
-                    		
-                    		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
-                    		if (flag == 1){return false;}
-                    	}
-                    }
-                    if (flag == -1)
-                    {
-                    	return false;
-                    }
-                }
-            }
-			return true;
-		}
+			ItemStack itemstack = this.theMechanical.getMechanicalInventory().getStackInSlot(i);
+            if (itemstack.isEmpty()){return false;}
+            else if (itemstack.getCount() < itemstack.getMaxStackSize()){return false;}
+        }
+	    return true;
 	}
 }
+
+

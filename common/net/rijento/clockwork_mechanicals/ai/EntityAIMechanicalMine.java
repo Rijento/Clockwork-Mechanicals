@@ -16,6 +16,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
+import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 
 public class EntityAIMechanicalMine extends EntityAIBase 
 {
@@ -26,7 +27,7 @@ public class EntityAIMechanicalMine extends EntityAIBase
 	private final int priority;
 	private int runtime;
 	private int breaktime;
-	
+	private int runtest;
 	
 	
 	public EntityAIMechanicalMine( EntityMechanicalWorker theMechanicalIn, BlockPos posIn, EnumFacing directionIn, boolean returnwhenlow, int priorityIn)
@@ -37,6 +38,10 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		this.returnsWhenLow = returnwhenlow;
 		this.priority = priorityIn;
 		this.runtime = 1;
+		if (!this.theMechanical.world.isRemote)
+		{
+			this.runtest = (int)(50 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
+		}
 	}
 	@Override
 	public boolean shouldExecute() 
@@ -56,13 +61,13 @@ public class EntityAIMechanicalMine extends EntityAIBase
 			}
 			else
 			{
-				if (this.runtime > 26){this.runtime = 1;}
+				if (this.runtime > this.runtest){this.runtime = 1;}
 				return true;
 			}
 		}
 		else
 		{
-			if (this.runtime > 26){this.runtime = 1;}
+			if (this.runtime > this.runtest){this.runtime = 1;}
 			return true;
 		}
 	}
@@ -77,6 +82,7 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		}
 		this.runtime++;
     }
+	
 	 /**
      * Breaks two blocks to make a tunnel
      */
@@ -88,22 +94,26 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		BlockPos botBreak = pos.offset(this.direction);
 		Boolean toptest = world.getBlockState(topBreak).getBlock().isBlockSolid(world, topBreak, this.direction.getOpposite()) && !(world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK) && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
 		Boolean bottest = world.getBlockState(botBreak).getBlock().isBlockSolid(world, botBreak, this.direction.getOpposite()) && !(world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK) && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
-		if (this.runtime % 26 == 0)
+		if (toptest)
 		{
-			if (toptest)
-			{
+			if (this.runtime % this.runtest == 0){
 				world.destroyBlock(topBreak, true);
 				this.theMechanical.unwind(0.5f);
-				return false;
 			}
-			else if (bottest && !(world.getBlockState(botBreak).getBlock() instanceof BlockTorch))
+			return false;
+		}
+		else if (bottest && !(world.getBlockState(botBreak).getBlock() instanceof BlockTorch))
+		{
+			if (this.runtime % this.runtest == 0)
 			{
 				world.destroyBlock(botBreak, true);
 				this.theMechanical.unwind(0.5f);
 				return true;
 			}
-			else{return true;}
+			return false;
 		}
+		else if (this.runtime % 15 == 0){runtime = 1; return true;}
+	
 		return false;
 	}
 	
@@ -115,7 +125,7 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		World world = this.theMechanical.getEntityWorld();
 		BlockPos pos = this.theMechanical.getPosition();
 		double blocks = Math.floor(Math.sqrt(this.theMechanical.getDistanceSq(this.start)));
-		if (blocks % 8 == 0 && this.hasTorch())
+		if (blocks % 8 == 0 && this.hasTorch() && world.getBlockState(pos.down()).getBlock().canPlaceTorchOnTop(world.getBlockState(pos.down()), world, pos))
 		{
 			this.getTorch();
 			this.theMechanical.unwind(0.25F);

@@ -52,6 +52,13 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		else{return false;}
 	}
 	
+	@Override
+	public boolean continueExecuting()
+	{
+		if (this.theMechanical.isWinding == true){return false;}
+		else {return true;}
+	}
+	
 	private boolean hasSaplings() 
 	{
 		for (int i = 0; i < this.theMechanical.getMechanicalInventory().getSizeInventory(); ++i)

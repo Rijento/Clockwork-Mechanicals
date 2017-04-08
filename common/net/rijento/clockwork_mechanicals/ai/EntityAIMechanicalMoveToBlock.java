@@ -45,7 +45,7 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 	
 	public boolean continueExecuting()
     {
-		
+		if (this.theMechanical.isWinding == true){return false;}
 		if (this.getIsAboveDestination() == true)
 		{
 			return false;

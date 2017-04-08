@@ -55,6 +55,7 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
      */
     public boolean continueExecuting()
     {
+    	if (this.theMechanical.isWinding == true){return false;}
     	super.continueExecuting();
     	return false;
     }

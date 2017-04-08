@@ -48,6 +48,7 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	@Override
 	public boolean continueExecuting()
 	{
+		if (this.theMechanical.isWinding == true){return false;}
 		if (this.fullyempty == true)
 		{
 			if (this.checkFull() == true)

@@ -72,6 +72,14 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		}
 	}
 	@Override
+	public boolean continueExecuting()
+	{
+		if (this.theMechanical.isWinding == true){return false;}
+		else {return true;}
+	}
+	
+	
+	@Override
 	public void updateTask()
     {
 		if (this.tunnel())

@@ -47,6 +47,14 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
         	return true;
         }
 	}
+	
+	@Override
+	public boolean continueExecuting()
+	{
+		if (this.theMechanical.isWinding == true){return false;}
+		else {return true;}
+	}
+	
 	public void updateTask()
     {
 		this.attemptCraft();

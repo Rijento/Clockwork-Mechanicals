@@ -60,7 +60,6 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 					this.runtime = 0;
 					return false;
 				}
-				this.runtime++;
 			}
 			else{return true;}
 		}

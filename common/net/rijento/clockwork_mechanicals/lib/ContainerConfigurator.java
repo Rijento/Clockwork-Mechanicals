@@ -20,12 +20,15 @@ public class ContainerConfigurator extends Container
 	public final ItemStack configuratorStack;
 	public final InventoryPlayer playerInventory;
 	public List<GhostSlot> ghostSlots = Lists.<GhostSlot>newArrayList();
-	public InventoryBasic filterInventory = new InventoryBasic("filterInventory", false, 9);
+	public InventoryBasic filterWithdraw;
+	public InventoryBasic filterDeposit;
 	
 	public ContainerConfigurator(InventoryPlayer playerInventory, ItemStack cnfgIn)
 	{
 		this.playerInventory = playerInventory;
 		this.configuratorStack = cnfgIn;
+		this.filterWithdraw = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.filterInventory;
+		this.filterDeposit = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.filterInventory;
 		this.current_task = cnfgIn.getTagCompound().getInteger("current_task");
 		if (this.current_task == 1 || this.current_task == 2 || this.current_task == 3 || this.current_task == 8)
 		{
@@ -44,13 +47,23 @@ public class ContainerConfigurator extends Container
 		}
 		else
 		{
-			if (this.current_task == 5 || this.current_task == 6)
+			if (this.current_task == 5)
 			{
 				for (int i = 0; i < 3; ++i)
 				{
 					for (int j = 0; j < 3; ++j)
 					{
-						this.addGhostSlot(new GhostSlot(filterInventory, j + i * 3, 16 + j * 18, 43 + i * 18));
+						this.addGhostSlot(new GhostSlot(filterWithdraw, j + i * 3, 16 + j * 18, 43 + i * 18));
+					}
+				}
+			}
+			if (this.current_task == 6)
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					for (int j = 0; j < 3; ++j)
+					{
+						this.addGhostSlot(new GhostSlot(filterDeposit, j + i * 3, 16 + j * 18, 43 + i * 18));
 					}
 				}
 			}
@@ -82,7 +95,7 @@ public class ContainerConfigurator extends Container
 	public void onContainerClosed(EntityPlayer playerIn)
     {
 		super.onContainerClosed(playerIn);
-		((ItemMechanicalConfigurator)configuratorStack.getItem()).saveCurrentTask(configuratorStack);
+		((ItemMechanicalConfigurator)configuratorStack.getItem()).save(configuratorStack);
     }
 
 	public void update()
@@ -106,13 +119,23 @@ public class ContainerConfigurator extends Container
 		}
 		else
 		{
-			if (this.current_task == 5 || this.current_task == 6)
+			if (this.current_task == 5)
 			{
 				for (int i = 0; i < 3; ++i)
 				{
 					for (int j = 0; j < 3; ++j)
 					{
-						this.addGhostSlot(new GhostSlot(filterInventory, j + i * 3, 16 + j * 18, 43 + i * 18));
+						this.addGhostSlot(new GhostSlot(filterWithdraw, j + i * 3, 16 + j * 18, 43 + i * 18));
+					}
+				}
+			}
+			if (this.current_task == 6)
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					for (int j = 0; j < 3; ++j)
+					{
+						this.addGhostSlot(new GhostSlot(filterDeposit, j + i * 3, 16 + j * 18, 43 + i * 18));
 					}
 				}
 			}

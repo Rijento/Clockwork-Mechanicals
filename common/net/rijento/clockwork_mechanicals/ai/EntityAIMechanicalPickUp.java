@@ -1,8 +1,7 @@
 package net.rijento.clockwork_mechanicals.ai;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockContainer;
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -11,7 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
-import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
+import net.rijento.clockwork_mechanicals.lib.filter.Filter;
 import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
 
 public class EntityAIMechanicalPickUp extends EntityAIBase {
@@ -22,8 +21,9 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	private int runtime;
 	private boolean fullyempty = true;
 	private int transferTime;
+	private Filter filter;
 	
-	public EntityAIMechanicalPickUp( EntityMechanicalWorker theMechanicalIn, BlockPos InventoryIn, int priorityIn)
+	public EntityAIMechanicalPickUp( EntityMechanicalWorker theMechanicalIn, BlockPos InventoryIn, int priorityIn, @Nullable Filter filterIn)
 	{
 		this.theMechanical = theMechanicalIn;
 		this.targetInventory = InventoryIn;
@@ -32,6 +32,7 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 		{
 			this.transferTime = (int)(8 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
 		}
+		if (filterIn != null){this.filter = filterIn;}
 	}
 	@Override
 	public boolean shouldExecute() {
@@ -97,13 +98,17 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
                     ItemStack itemstack = InventoryIn.getStackInSlot(i);
                     Item item = InventoryIn.getStackInSlot(i).getItem();
                     int flag = 1;
-                    for (FilterBase filter : this.theMechanical.filters)
+                    if (filter != null){
+	                    if (!filter.filterStatisfied(itemstack))
+	                    {
+	                    	this.runtime++;
+	                    	continue;
+	                    }
+                    }
+                    for (KeepAmnt filter : this.theMechanical.filters)
                     {
-                    	if (filter instanceof KeepAmnt)
-                    	{
-                    		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
-                    		if (flag == 0){break;}
-                    	}
+                		flag = filter.filterStatified(itemstack, mechainicalInventory);
+                		if (flag == 0){break;}
                     }
                     if (!(flag == 0))
                     {

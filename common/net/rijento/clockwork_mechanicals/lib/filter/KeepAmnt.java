@@ -7,11 +7,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
-public class KeepAmnt extends FilterBase 
+public class KeepAmnt
 {
 	public ItemStack item;
 	public int amount;
-	public static String type = "KeepAmnt";
 	
 	public KeepAmnt(ItemStack itemIn, int amountIn)
 	{
@@ -45,17 +44,15 @@ public class KeepAmnt extends FilterBase
 		else{return 0;}
 	}
 	
-	@Override
 	public NBTTagCompound getFilterNBT()
 	{
 		NBTTagCompound Tag = new NBTTagCompound();
-		Tag.setString("type", "KeepAmnt");
 		Tag.setTag("item", this.item.writeToNBT(new NBTTagCompound()));
 		Tag.setInteger("amount", this.amount);
 		
 		return Tag;
 	}
-	@Override
+	
 	public boolean equals(Object obj)
 	{
 		if (obj == null) {return false;}

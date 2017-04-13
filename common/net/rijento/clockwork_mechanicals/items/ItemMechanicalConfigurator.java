@@ -5,18 +5,11 @@ import java.util.List;
 
 import org.lwjgl.input.Keyboard;
 
-import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockCrops;
-import net.minecraft.block.BlockDirt;
-import net.minecraft.block.BlockFarmland;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockSapling;
-import net.minecraft.block.BlockStone;
-import net.minecraft.block.BlockWorkbench;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,10 +27,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.lib.Order;
+import net.rijento.clockwork_mechanicals.lib.filter.Filter;
 
 public class ItemMechanicalConfigurator extends Item
 {
 	public int current_task = 0;
+	public Filter withdrawFilter = new Filter();
+	public Filter depositFilter = new Filter();
 	public ItemMechanicalConfigurator()
 	{
 		this.setMaxStackSize(1);
@@ -68,7 +64,7 @@ public class ItemMechanicalConfigurator extends Item
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
 		if (!worldIn.isRemote && Keyboard.isKeyDown(Keyboard.KEY_LMENU) && handIn == EnumHand.MAIN_HAND){
-			loadCurrentTask(playerIn.getHeldItemMainhand());
+			load(playerIn.getHeldItemMainhand());
 			playerIn.openGui(ClockworkMechanicals.instance, 0, worldIn, playerIn.getPosition().getX(), playerIn.getPosition().getY(), playerIn.getPosition().getZ());
 			return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}
@@ -81,7 +77,7 @@ public class ItemMechanicalConfigurator extends Item
 		if (!worldIn.isRemote && hand == EnumHand.MAIN_HAND)
 		{
 			ItemStack stack = player.getHeldItemMainhand();
-			loadCurrentTask(stack);
+			load(stack);
 			if (this.current_task == 1){
 				if (worldIn.getBlockState(pos).getBlock() instanceof BlockCrops)
 				{
@@ -151,7 +147,9 @@ public class ItemMechanicalConfigurator extends Item
 					removeOrder(pos, "pickup", stack);
 					return EnumActionResult.SUCCESS;
 				}
-				addOrder(pos,"pickup",stack);
+				Order pickup = new Order(pos, "pickup");
+				pickup.filter = this.withdrawFilter;
+				this.addOrder(pickup, stack);
 		        return EnumActionResult.SUCCESS;
 			}
 			else if (this.current_task == 6)
@@ -161,7 +159,9 @@ public class ItemMechanicalConfigurator extends Item
 					removeOrder(pos, "dropoff", stack);
 					return EnumActionResult.SUCCESS;
 				}
-				addOrder(pos,"dropoff",stack);
+				Order dropoff = new Order(pos, "dropoff");
+				dropoff.filter = this.depositFilter;
+				this.addOrder(dropoff, stack);
 		        return EnumActionResult.SUCCESS;
 			}
 		}
@@ -272,7 +272,7 @@ public class ItemMechanicalConfigurator extends Item
 		}
 		return orders;
 	}
-	public void setCurrentTask(ItemStack stack, int value)
+	public void save(ItemStack stack)
 	{
 		if (!stack.hasTagCompound())
 		{
@@ -280,8 +280,27 @@ public class ItemMechanicalConfigurator extends Item
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
 			stack.getTagCompound().setInteger("current_task", 0);
 		}
-		stack.getTagCompound().setInteger("current_task", value);
+		stack.getTagCompound().setInteger("current_task", this.current_task);
+		stack.getTagCompound().setTag("filterWithdraw", this.withdrawFilter.getFilterNBT());
+		stack.getTagCompound().setTag("filterDeposit", this.depositFilter.getFilterNBT());
 	}
+	public void load(ItemStack stack)
+	{
+		if (!stack.hasTagCompound())
+		{
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setTag("Orders", new NBTTagList());
+			stack.getTagCompound().setInteger("current_task", 0);
+			stack.getTagCompound().setTag("filterWithdraw", new Filter().getFilterNBT());
+			stack.getTagCompound().setTag("filterDeposit",  new Filter().getFilterNBT());
+		}
+		this.current_task = stack.getTagCompound().getInteger("current_task");
+		this.withdrawFilter = new Filter(stack.getTagCompound().getCompoundTag("filterWithdraw"));
+		this.depositFilter = new Filter(stack.getTagCompound().getCompoundTag("filterDeposit"));
+	}
+	
+	
+	
 	public void saveCurrentTask(ItemStack stack)
 	{
 		if (!stack.hasTagCompound())

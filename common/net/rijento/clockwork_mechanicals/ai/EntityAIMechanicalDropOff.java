@@ -1,7 +1,7 @@
 package net.rijento.clockwork_mechanicals.ai;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -10,9 +10,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
-import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
+import net.rijento.clockwork_mechanicals.lib.filter.Filter;
 import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
-import net.rijento.clockwork_mechanicals.lib.filter.Whitelist;
 
 public class EntityAIMechanicalDropOff extends EntityAIBase
 {
@@ -23,8 +22,9 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	private int runtime;
 	private boolean fullyempty = true;
 	private int transferTime;
+	private Filter filter;
 	
-	public EntityAIMechanicalDropOff( EntityMechanicalWorker theMechanicalIn, BlockPos InventoryIn, int priorityIn)
+	public EntityAIMechanicalDropOff( EntityMechanicalWorker theMechanicalIn, BlockPos InventoryIn, int priorityIn, @Nullable Filter filterIn)
 	{
 		this.theMechanical = theMechanicalIn;
 		this.targetInventory = InventoryIn;
@@ -33,6 +33,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		{
 			this.transferTime = (int)(8 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
 		}
+		if (filterIn != null){this.filter = filterIn;}
 	}
 	@Override
 	public boolean shouldExecute() {
@@ -77,8 +78,8 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	public void updateTask()
     {
 		TileEntity te = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
-		if (!(te instanceof IInventory)){this.runtime++; return;}
-		else if (this.theMechanical.getDistanceSqToCenter(this.targetInventory) > 3.0D){return;}
+		if (this.theMechanical.getDistanceSqToCenter(this.targetInventory) > 3.0D){return;}
+		else if (!(te instanceof IInventory)){this.runtime++; return;}
 		else
 		{
 			IInventory InventoryOut = ((IInventory)te);
@@ -90,15 +91,18 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                 {
                     ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
                     Item item = mechainicalInventory.getStackInSlot(i).getItem();
+                    if (filter != null){
+	                    if (!filter.filterStatisfied(itemstack))
+	                    {
+	                    	this.runtime++;
+	                    	continue;
+	                    }
+                    }
                     int flag = 1;
-                    for (FilterBase filter : this.theMechanical.filters)
+                    for (KeepAmnt filter : this.theMechanical.filters)
                     {
-                    	if (filter instanceof KeepAmnt)
-                    	{
-                    		
-                    		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
-                    		if (flag == 0){break;}
-                    	}
+                    	flag = filter.filterStatified(itemstack, mechainicalInventory);
+                    	if (flag == 0){break;}
                     }
                     if (!(flag == 0))
                     {
@@ -168,14 +172,10 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                 {
                     ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
                     int flag = 1;
-                    for (FilterBase filter : this.theMechanical.filters)
+                    for (KeepAmnt filter : this.theMechanical.filters)
                     {
-                    	if (filter instanceof KeepAmnt)
-                    	{
-                    		
-                    		flag = ((KeepAmnt)filter).filterStatified(itemstack, mechainicalInventory);
-                    		if (flag == 1){return false;}
-                    	}
+                    	flag = filter.filterStatified(itemstack, mechainicalInventory);
+                    	if (flag == 1){return false;}
                     }
                     if (flag == -1)
                     {

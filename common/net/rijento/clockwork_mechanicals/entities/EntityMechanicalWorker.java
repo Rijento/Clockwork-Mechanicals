@@ -35,13 +35,12 @@ import net.rijento.clockwork_mechanicals.ai.PathNavigateMechanical;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.ContainerBasic;
 import net.rijento.clockwork_mechanicals.lib.Order;
-import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
 import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
 
 public class EntityMechanicalWorker extends EntityGolem 
 {
 	public List<Order> orders;
-	public List<FilterBase> filters = new ArrayList<FilterBase>();
+	public List<KeepAmnt> filters = new ArrayList<KeepAmnt>();
 	public boolean isWinding = false;
 	private ItemStack Mainspring;
 	private int currentTask;
@@ -157,12 +156,12 @@ public class EntityMechanicalWorker extends EntityGolem
 				}
 				continue;
 			case "dropoff":
-				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i);
+				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i, order.filter);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskDropoff);
 				continue;
 			case "pickup":
-				EntityAIMechanicalPickUp taskPickup = new EntityAIMechanicalPickUp(this, order.pos, i);
+				EntityAIMechanicalPickUp taskPickup = new EntityAIMechanicalPickUp(this, order.pos, i, order.filter);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskPickup);
 				continue;

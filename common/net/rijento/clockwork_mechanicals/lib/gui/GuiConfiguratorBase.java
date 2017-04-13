@@ -53,8 +53,8 @@ public class GuiConfiguratorBase extends GuiContainer
 		super(new ContainerConfigurator(inventory, configuratorIn));
 		this.configuratorStack = configuratorIn;
 		this.selected = configuratorStack.getTagCompound().getInteger("current_task");
-		this.xSize = 176;
-		this.ySize = 136;
+		if (selected >= 4 && selected <= 7){this.xSize = 176; this.ySize = 222;}
+		else{this.xSize = 176; this.ySize = 136;}
 	}
 	@Override
 	public void initGui()
@@ -74,11 +74,13 @@ public class GuiConfiguratorBase extends GuiContainer
         {
         	if (buttonBlackWhite1 == null){buttonList.add(buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
         	else{buttonList.add(buttonBlackWhite1);}
+        	buttonBlackWhite1.BoW = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.Whitelist;
         }
         if (selected == 6)
         {
         	if (buttonBlackWhite2 == null){buttonList.add(buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
         	else{buttonList.add(buttonBlackWhite2);}
+        	buttonBlackWhite2.BoW = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.Whitelist;
         }
         
         buttonList.add(buttonCraft = new Button(7,i+124,j+7));
@@ -225,12 +227,14 @@ public class GuiConfiguratorBase extends GuiContainer
 			if (buttonBlackWhite1.BoW)
 			{
 				buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
+				((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.Whitelist = false;
 				buttonBlackWhite1.BoW = false;
 				return;
 			}
 			else
 			{
 				buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
+				((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.Whitelist = true;
 				buttonBlackWhite1.BoW = true;
 				return;
 			}
@@ -240,12 +244,14 @@ public class GuiConfiguratorBase extends GuiContainer
 			if (buttonBlackWhite2.BoW)
 			{
 				buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
+				((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.Whitelist = false;
 				buttonBlackWhite2.BoW = false;
 				return;
 			}
 			else
 			{
 				buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
+				((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.Whitelist = true;
 				buttonBlackWhite2.BoW = true;
 				return;
 			}

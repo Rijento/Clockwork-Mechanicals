@@ -1,23 +1,15 @@
 package net.rijento.clockwork_mechanicals.lib;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants;
-import net.rijento.clockwork_mechanicals.lib.filter.Blacklist;
-import net.rijento.clockwork_mechanicals.lib.filter.FilterBase;
-import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
-import net.rijento.clockwork_mechanicals.lib.filter.Whitelist;
+import net.rijento.clockwork_mechanicals.lib.filter.Filter;
 
 public class Order 
 {
 	public final BlockPos pos;
 	public final String command;
-	public final List<FilterBase> filters = new ArrayList<FilterBase>();
+	public Filter filter;
 	public EnumFacing facing;
 
 	public Order(BlockPos pos, String command)
@@ -25,14 +17,11 @@ public class Order
 		this.pos = pos;
 		this.command = command;
 	}
-	public Order(BlockPos pos, String command, FilterBase ...filtersIn)
+	public Order(BlockPos pos, String command, Filter filterIn)
 	{
 		this.pos = pos;
 		this.command = command;
-		for (FilterBase filter : filtersIn)
-		{
-			this.filters.add(filter);
-		}
+		this.filter = filterIn;
 	}
 	public void setFacing(EnumFacing dirIn)
 	{
@@ -50,15 +39,10 @@ public class Order
 		Tag.setBoolean("hasfilters", false);
 		Tag.setBoolean("hasfacing", false);
 		
-		if (!this.filters.isEmpty())
+		if (this.filter != null)
 		{
-			NBTTagList list = new NBTTagList();
-			for (FilterBase filter : this.filters)
-			{
-				list.appendTag(filter.getFilterNBT());
-			}
-			Tag.setTag("filters", list);
-			Tag.setBoolean("hasfilters", true);
+			Tag.setTag("filter", this.filter.getFilterNBT());
+			Tag.setBoolean("hasfilter", true);
 		}
 		if (!(this.facing == null))
 		{
@@ -72,25 +56,9 @@ public class Order
 	{
 		this.pos = new BlockPos(orderNBT.getInteger("x"),orderNBT.getInteger("y"),orderNBT.getInteger("z"));
 		this.command = orderNBT.getString("Command");
-		this.filters.clear();
-		if (orderNBT.getBoolean("hasfilters"))
+		if (orderNBT.getBoolean("hasfilter"))
 		{
-			NBTTagList nbttaglist2 = orderNBT.getTagList("filters", Constants.NBT.TAG_COMPOUND);
-			for (int i = 0; i < nbttaglist2.tagCount(); ++i)
-	        {
-				switch (FilterBase.getNBTType(nbttaglist2.getCompoundTagAt(i)))
-				{
-				case("KeepAmnt"):
-					this.filters.add(new KeepAmnt(nbttaglist2.getCompoundTagAt(i)));
-					continue;
-				case("Blacklist"):
-					this.filters.add(new Blacklist(nbttaglist2.getCompoundTagAt(i)));
-					continue;
-				case("Whitelist"):
-					this.filters.add(new Whitelist(nbttaglist2.getCompoundTagAt(i)));
-					continue;
-				}
-	        }
+			this.filter = new Filter(orderNBT.getCompoundTag("filter"));
 		}
 		if (orderNBT.getBoolean("hasfacing"))
 		{

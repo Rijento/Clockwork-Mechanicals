@@ -108,6 +108,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	                    {
 	                    	itemstack.shrink(1);
 	                    	this.theMechanical.unwind(0.05F);
+	                    	this.runtime = 0;
 	                    	InventoryOut.markDirty();
 	                        break;
 	                    }

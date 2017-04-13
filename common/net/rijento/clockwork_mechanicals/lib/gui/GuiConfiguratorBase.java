@@ -1,12 +1,19 @@
 package net.rijento.clockwork_mechanicals.lib.gui;
 
+import java.io.IOException;
+
 import javax.annotation.Nullable;
+
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -65,12 +72,12 @@ public class GuiConfiguratorBase extends GuiContainer
         
         if (selected == 5)
         {
-        	if (buttonBlackWhite1 == null){buttonList.add(buttonBlackWhite1 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - 222) / 2) + 43));}
+        	if (buttonBlackWhite1 == null){buttonList.add(buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
         	else{buttonList.add(buttonBlackWhite1);}
         }
         if (selected == 6)
         {
-        	if (buttonBlackWhite2 == null){buttonList.add(buttonBlackWhite2 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - 222) / 2) + 43));}
+        	if (buttonBlackWhite2 == null){buttonList.add(buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
         	else{buttonList.add(buttonBlackWhite2);}
         }
         
@@ -96,7 +103,11 @@ public class GuiConfiguratorBase extends GuiContainer
 			int i = (this.width - this.xSize) / 2;
 	        int j = (this.height - this.ySize) / 2;
 	        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-			fontRendererObj.drawString("Filter", ((this.width - this.xSize) / 2) + 31, ((this.height - this.ySize) / 2) + 32, 1);
+	        for (GhostSlot slot : ((ContainerConfigurator)this.inventorySlots).ghostSlots)
+			{
+				drawGhostSlot(slot, mouseX, mouseY);
+			}
+			fontRendererObj.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
 			return;
 		}
 		else if (selected == 6)
@@ -107,13 +118,18 @@ public class GuiConfiguratorBase extends GuiContainer
 			int i = (this.width - this.xSize) / 2;
 	        int j = (this.height - this.ySize) / 2;
 	        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-			fontRendererObj.drawString("Filter", ((this.width - this.xSize) / 2) + 31, ((this.height - this.ySize) / 2) + 32, 1);
+	        for (GhostSlot slot : ((ContainerConfigurator)this.inventorySlots).ghostSlots)
+			{
+				drawGhostSlot(slot, mouseX, mouseY);
+			}
+			fontRendererObj.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
 			return;
 		}
 		else if (selected == 7){this.xSize = 176; this.ySize = 222; this.mc.getTextureManager().bindTexture(craftTexture);}
 		else if (selected == 8){this.xSize = 176; this.ySize = 136; this.mc.getTextureManager().bindTexture(windTexture);}
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
+        
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 
 	}
@@ -170,10 +186,10 @@ public class GuiConfiguratorBase extends GuiContainer
 			if (buttonBlackWhite1 != null)
 			{
 				boolean temp = buttonBlackWhite1.BoW;
-				buttonBlackWhite1 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - 222) / 2) + 43);
+				buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43);
 				buttonBlackWhite1.BoW = temp;	
 			}
-			else{buttonBlackWhite1 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - 222) / 2) + 43);}
+			else{buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43);}
 			
 		}
 		else if (parButton == buttonDeposit)
@@ -185,10 +201,10 @@ public class GuiConfiguratorBase extends GuiContainer
 			if (buttonBlackWhite2 != null)
 			{
 				boolean temp = buttonBlackWhite2.BoW;
-				buttonBlackWhite2 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - 222) / 2) + 43);
+				buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43);
 				buttonBlackWhite2.BoW = temp;	
 			}
-			else{buttonBlackWhite2 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - 222) / 2) + 43);}
+			else{buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43);}
 		}
 		else if (parButton == buttonCraft)
 		{
@@ -208,13 +224,13 @@ public class GuiConfiguratorBase extends GuiContainer
 		{
 			if (buttonBlackWhite1.BoW)
 			{
-				buttonBlackWhite1 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - this.ySize) / 2) + 43);
+				buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
 				buttonBlackWhite1.BoW = false;
 				return;
 			}
 			else
 			{
-				buttonBlackWhite1 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - this.ySize) / 2) + 43);
+				buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
 				buttonBlackWhite1.BoW = true;
 				return;
 			}
@@ -223,18 +239,115 @@ public class GuiConfiguratorBase extends GuiContainer
 		{
 			if (buttonBlackWhite2.BoW)
 			{
-				buttonBlackWhite2 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - this.ySize) / 2) + 43);
+				buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
 				buttonBlackWhite2.BoW = false;
 				return;
 			}
 			else
 			{
-				buttonBlackWhite2 = new ButtonBW(9, ((this.width - this.xSize) / 2) + 88, ((this.height - this.ySize) / 2) + 43);
+				buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, guiTop + 43);
 				buttonBlackWhite2.BoW = true;
 				return;
 			}
 		}
     }
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+		super.drawScreen(mouseX, mouseY, partialTicks);
+    }
+	
+	public void drawGhostSlot(GhostSlot slotIn, int mouseX, int mouseY)
+    {
+		zLevel = 0.0F;
+	    itemRender.zLevel = -25.0F;
+	    GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+	    GL11.glEnable(GL11.GL_LIGHTING);
+	    GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+	    GL11.glEnable(GL11.GL_DEPTH_TEST);
+	    RenderHelper.enableGUIStandardItemLighting();
+	    ItemStack stack = slotIn.getStack();
+	    if (stack != null)
+	    {
+	    	itemRender.renderItemAndEffectIntoGUI(stack, slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1);
+	    	GL11.glDisable(GL11.GL_LIGHTING);
+	        GL11.glDisable(GL11.GL_DEPTH_TEST);
+	        GL11.glEnable(GL11.GL_BLEND);
+	        GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.3F);
+	        String guiTexture = "test";
+//	        if (guiTexture == null) {
+//	          //NEUTRAL_SLOT_BACKGROUND.getMap().render(NEUTRAL_SLOT_BACKGROUND, gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, gui.getZlevel(), true);
+//	        } else {
+	        	this.mc.getTextureManager().bindTexture(withdrawTexture);
+	        	drawTexturedModalRect(slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1, slotIn.xPos, slotIn.yPos, 16, 16);
+//	        }
+	        GL11.glEnable(GL11.GL_DEPTH_TEST);
+	        GL11.glEnable(GL11.GL_LIGHTING);
+	    }
+	    if (slotIn.isMouseOver(mouseX - guiLeft, mouseY - guiTop))
+	    {
+	    	GL11.glDisable(GL11.GL_LIGHTING);
+	        GL11.glDisable(GL11.GL_DEPTH_TEST);
+	        GL11.glColorMask(true, true, true, true);
+	        GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.3F);
+	        drawGradientRect(slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1, slotIn.xPos + guiLeft + 16 + 1, slotIn.yPos + guiTop + 16 + 1, 0x80FFFFFF, 0x80FFFFFF);
+	        GL11.glColorMask(true, true, true, true);
+	        GL11.glEnable(GL11.GL_DEPTH_TEST);
+	        GL11.glEnable(GL11.GL_LIGHTING);
+	    }
+	    GL11.glPopAttrib();
+	    GL11.glEnable(GL11.GL_BLEND);
+	    itemRender.zLevel = 0.0F;
+	    zLevel = 0.0F;
+    }
+	
+	@Override
+	protected void mouseClicked(int x, int y, int button) throws IOException
+	{
+		for (GhostSlot slot : ((ContainerConfigurator)this.inventorySlots).ghostSlots)
+		{
+			if (slot.isMouseOver(x - guiLeft, y - guiTop))
+			{
+				ItemStack handStack = Minecraft.getMinecraft().player.inventory.getItemStack();
+			    ItemStack existingStack = slot.getStack();
+			    if (handStack == null || handStack.getItem() == null || handStack.getCount() == 0)
+			    { // empty hand
+			        slot.putStack(ItemStack.EMPTY);
+			    } 
+			    else 
+			    { // item in hand
+			        if (existingStack == null || existingStack.getItem() == null || existingStack.getCount() == 0)
+			        { // empty slot
+			        	slot.putStack(handStack);
+			        } 
+			        else
+			        { // filled slot
+			        	if (ItemStack.areItemsEqual(existingStack, handStack) && ItemStack.areItemStackTagsEqual(existingStack, handStack))
+			        	{ // same item
+				            if (existingStack.getCount() < existingStack.getMaxStackSize() && existingStack.getCount() < slot.getSlotStackLimit())
+				            {
+				            	existingStack.grow(handStack.getCount());;
+				            } 
+				            else 
+				            {
+				              // NOP
+				            }
+   			            } 
+			        	else 
+   			            { // different item
+			                slot.putStack(handStack);
+			            }
+			        }
+			    }
+			}
+		}
+		
+		super.mouseClicked(x, y, button);
+	}
+	
+	
+	
+	
 
 	@SideOnly (Side.CLIENT)
 	static class Button extends GuiButton
@@ -242,7 +355,6 @@ public class GuiConfiguratorBase extends GuiContainer
 
 		public Button(int buttonId, int x, int y) {
 			super(buttonId, x, y, 18, 18, "");
-			// TODO Auto-generated constructor stub
 		}
 		@Override
         public void drawButton(Minecraft mc, int parX, int parY)

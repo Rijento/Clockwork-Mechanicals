@@ -68,6 +68,7 @@ public class ItemMechanicalConfigurator extends Item
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
 		if (!worldIn.isRemote && Keyboard.isKeyDown(Keyboard.KEY_LMENU) && handIn == EnumHand.MAIN_HAND){
+			loadCurrentTask(playerIn.getHeldItemMainhand());
 			playerIn.openGui(ClockworkMechanicals.instance, 0, worldIn, playerIn.getPosition().getX(), playerIn.getPosition().getY(), playerIn.getPosition().getZ());
 			return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}

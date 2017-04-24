@@ -92,7 +92,7 @@ public class GuiConfiguratorBase extends GuiContainer
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) 
 	{
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		if (selected == 0){this.mc.getTextureManager().bindTexture(basicTexture);}
+		if (selected == 0){this.xSize = 176; this.ySize = 136; this.mc.getTextureManager().bindTexture(basicTexture);}
 		else if (selected == 1){this.xSize = 176; this.ySize = 136; this.mc.getTextureManager().bindTexture(farmTexture);}
 		else if (selected == 2){this.xSize = 176; this.ySize = 136; this.mc.getTextureManager().bindTexture(chopTexture);}
 		else if (selected == 3){this.xSize = 176; this.ySize = 136; this.mc.getTextureManager().bindTexture(slayTexture);}

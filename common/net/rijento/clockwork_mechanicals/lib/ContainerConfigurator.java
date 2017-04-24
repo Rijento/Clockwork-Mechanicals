@@ -30,7 +30,7 @@ public class ContainerConfigurator extends Container
 		this.filterWithdraw = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.filterInventory;
 		this.filterDeposit = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.filterInventory;
 		this.current_task = cnfgIn.getTagCompound().getInteger("current_task");
-		if (this.current_task == 1 || this.current_task == 2 || this.current_task == 3 || this.current_task == 8)
+		if (this.current_task == 0 || this.current_task == 1 || this.current_task == 2 || this.current_task == 3 || this.current_task == 8)
 		{
 			for (int l = 0; l < 3; ++l)
 	        {
@@ -58,6 +58,16 @@ public class ContainerConfigurator extends Container
 				}
 			}
 			if (this.current_task == 6)
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					for (int j = 0; j < 3; ++j)
+					{
+						this.addGhostSlot(new GhostSlot(filterDeposit, j + i * 3, 16 + j * 18, 43 + i * 18));
+					}
+				}
+			}
+			if (this.current_task == 7)
 			{
 				for (int i = 0; i < 3; ++i)
 				{

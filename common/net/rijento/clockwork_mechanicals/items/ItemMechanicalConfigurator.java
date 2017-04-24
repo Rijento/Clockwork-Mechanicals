@@ -44,7 +44,7 @@ public class ItemMechanicalConfigurator extends Item
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
     {
 		tooltip.add(TextFormatting.WHITE + "Number of orders: " + String.valueOf(this.getNumOrders(stack)));
-		tooltip.add(TextFormatting.WHITE + "L-Alt + Right-click to open GUI.");
+		tooltip.add(TextFormatting.WHITE + "Right-click in offhnad to open GUI.");
 		tooltip.add(TextFormatting.WHITE + "Right-click to add order.");
 		tooltip.add(TextFormatting.WHITE + "Ctrl + right-click to remove order.");
 		tooltip.add(TextFormatting.WHITE + "Shift + right-click on mechanical to give orders.");
@@ -63,8 +63,8 @@ public class ItemMechanicalConfigurator extends Item
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
-		if (!worldIn.isRemote && Keyboard.isKeyDown(Keyboard.KEY_LMENU) && handIn == EnumHand.MAIN_HAND){
-			load(playerIn.getHeldItemMainhand());
+		if (!worldIn.isRemote && handIn == EnumHand.OFF_HAND){
+			load(playerIn.getHeldItemOffhand());
 			playerIn.openGui(ClockworkMechanicals.instance, 0, worldIn, playerIn.getPosition().getX(), playerIn.getPosition().getY(), playerIn.getPosition().getZ());
 			return new ActionResult(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}
@@ -165,50 +165,7 @@ public class ItemMechanicalConfigurator extends Item
 		        return EnumActionResult.SUCCESS;
 			}
 		}
-//		if (worldIn.getBlockState(pos).getBlock() instanceof BlockChest)
-//		{
-//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-//			{
-//				removeOrder(pos, "dropoff", stack);
-//				return EnumActionResult.SUCCESS;
-//			}
-//			addOrder(pos,"dropoff",stack);
-//	        return EnumActionResult.SUCCESS;
-//		}
 //		
-//		if (worldIn.getBlockState(pos).getBlock() instanceof BlockWorkbench)
-//		{
-//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-//			{
-//				removeOrder(pos, "craft", stack);
-//				return EnumActionResult.SUCCESS;
-//			}
-//			addOrder(pos,"craft",stack);
-//	        return EnumActionResult.SUCCESS;
-//		}
-//		if (worldIn.getBlockState(pos) ==Blocks.DIRT.getDefaultState().withProperty(PropertyEnum.<BlockDirt.DirtType>create("variant", BlockDirt.DirtType.class), BlockDirt.DirtType.byMetadata(BlockDirt.DirtType.COARSE_DIRT.getMetadata())))
-//		{
-//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-//			{
-//				removeOrder(pos, "chop", stack);
-//				return EnumActionResult.SUCCESS;
-//			}
-//			addOrder(pos,"chop",stack);
-//	        return EnumActionResult.SUCCESS;
-//		}
-//		if (worldIn.getBlockState(pos).getBlock() instanceof BlockStone)
-//		{
-//			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
-//			{
-//				removeOrder(pos, "mine", stack);
-//				return EnumActionResult.SUCCESS;
-//			}
-//			Order mine = new Order(pos,"mine");
-//			mine.setFacing(facing.getOpposite());
-//			addOrder(mine, stack);
-//			
-//	        return EnumActionResult.SUCCESS;
-//		}
 		return EnumActionResult.PASS;
 		
     }

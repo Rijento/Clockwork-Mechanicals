@@ -14,7 +14,7 @@ public class MechanicalGuiHandler implements IGuiHandler
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		if (ID == CONFIGURATOR_GUI)
 		{
-			return new ContainerConfigurator(player.inventory, player.getHeldItemMainhand());
+			return new ContainerConfigurator(player.inventory, player.getHeldItemOffhand());
 		}
 		return null;
 	}
@@ -23,7 +23,7 @@ public class MechanicalGuiHandler implements IGuiHandler
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		if (ID == CONFIGURATOR_GUI)
 		{
-			return new GuiConfiguratorBase(player.inventory, player.getHeldItemMainhand(), world);
+			return new GuiConfiguratorBase(player.inventory, player.getHeldItemOffhand(), world);
 		}
 		return null;
 	}

@@ -34,7 +34,7 @@ public class Filter
 
             if (!itemstack.isEmpty())
             {
-                this.filterInventory.addItem(itemstack);
+                this.filterInventory.setInventorySlotContents(i, itemstack);
             }
         }
         this.Whitelist = compound.getBoolean("Whitelist");
@@ -44,6 +44,7 @@ public class Filter
 	{
 		if (this.Whitelist)
 		{
+			if (this.filterInventory.isEmpty()) {return false;}
 			for (int i = 0; i < 9 && i < this.filterInventory.getSizeInventory(); i++)
 			{
 				if (ItemStack.areItemsEqualIgnoreDurability(TestStack, this.filterInventory.getStackInSlot(i)) && ItemStack.areItemStackTagsEqual(TestStack, this.filterInventory.getStackInSlot(i)))
@@ -55,6 +56,7 @@ public class Filter
 		}
 		else
 		{
+			if (this.filterInventory.isEmpty()) {return true;}
 			for (int i = 0; i < 9 && i < this.filterInventory.getSizeInventory(); i++)
 			{
 				if (ItemStack.areItemsEqualIgnoreDurability(TestStack, this.filterInventory.getStackInSlot(i)) && ItemStack.areItemStackTagsEqual(TestStack, this.filterInventory.getStackInSlot(i)))
@@ -79,6 +81,10 @@ public class Filter
             if (!itemstack.isEmpty())
             {
                 nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
+            }
+            else
+            {
+            	nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
             }
         }
         compound.setTag("Items", nbttaglist);

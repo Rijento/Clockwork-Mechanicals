@@ -127,7 +127,20 @@ public class GuiConfiguratorBase extends GuiContainer
 			fontRendererObj.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
 			return;
 		}
-		else if (selected == 7){this.xSize = 176; this.ySize = 222; this.mc.getTextureManager().bindTexture(craftTexture);}
+		else if (selected == 7)
+		{
+			this.xSize = 176;
+			this.ySize = 222;
+			this.mc.getTextureManager().bindTexture(craftTexture);
+			int i = (this.width - this.xSize) / 2;
+	        int j = (this.height - this.ySize) / 2;
+	        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+	        for (GhostSlot slot : ((ContainerConfigurator)this.inventorySlots).ghostSlots)
+			{
+				drawGhostSlot(slot, mouseX, mouseY);
+			}
+			return;
+		}
 		else if (selected == 8){this.xSize = 176; this.ySize = 136; this.mc.getTextureManager().bindTexture(windTexture);}
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
@@ -267,7 +280,6 @@ public class GuiConfiguratorBase extends GuiContainer
     {
 		zLevel = 0.0F;
 	    itemRender.zLevel = -25.0F;
-	    GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
 	    GL11.glEnable(GL11.GL_LIGHTING);
 	    GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 	    GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -280,13 +292,8 @@ public class GuiConfiguratorBase extends GuiContainer
 	        GL11.glDisable(GL11.GL_DEPTH_TEST);
 	        GL11.glEnable(GL11.GL_BLEND);
 	        GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.3F);
-	        String guiTexture = "test";
-//	        if (guiTexture == null) {
-//	          //NEUTRAL_SLOT_BACKGROUND.getMap().render(NEUTRAL_SLOT_BACKGROUND, gui.getGuiLeft() + slot.x, gui.getGuiTop() + slot.y, gui.getZlevel(), true);
-//	        } else {
-	        	this.mc.getTextureManager().bindTexture(withdrawTexture);
-	        	drawTexturedModalRect(slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1, slotIn.xPos, slotIn.yPos, 16, 16);
-//	        }
+        	this.mc.getTextureManager().bindTexture(withdrawTexture);
+	        drawGradientRect(slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1, slotIn.xPos + guiLeft + 16 + 1, slotIn.yPos + guiTop + 16 + 1, 0x608B8B8B, 0x608B8B8B);
 	        GL11.glEnable(GL11.GL_DEPTH_TEST);
 	        GL11.glEnable(GL11.GL_LIGHTING);
 	    }
@@ -301,8 +308,7 @@ public class GuiConfiguratorBase extends GuiContainer
 	        GL11.glEnable(GL11.GL_DEPTH_TEST);
 	        GL11.glEnable(GL11.GL_LIGHTING);
 	    }
-	    GL11.glPopAttrib();
-	    GL11.glEnable(GL11.GL_BLEND);
+	    GL11.glDisable(GL11.GL_LIGHTING);
 	    itemRender.zLevel = 0.0F;
 	    zLevel = 0.0F;
     }
@@ -315,6 +321,7 @@ public class GuiConfiguratorBase extends GuiContainer
 			if (slot.isMouseOver(x - guiLeft, y - guiTop))
 			{
 				ItemStack handStack = Minecraft.getMinecraft().player.inventory.getItemStack();
+
 			    ItemStack existingStack = slot.getStack();
 			    if (handStack == null || handStack.getItem() == null || handStack.getCount() == 0)
 			    { // empty hand

@@ -77,15 +77,7 @@ public class Filter
         for (int i = 0; i < this.filterInventory.getSizeInventory(); ++i)
         {
             ItemStack itemstack = this.filterInventory.getStackInSlot(i);
-
-            if (!itemstack.isEmpty())
-            {
-                nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
-            }
-            else
-            {
-            	nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
-            }
+            nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
         }
         compound.setTag("Items", nbttaglist);
         compound.setBoolean("Whitelist", this.Whitelist);

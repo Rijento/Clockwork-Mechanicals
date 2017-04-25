@@ -10,6 +10,7 @@ import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -26,6 +27,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
+import net.rijento.clockwork_mechanicals.lib.ContainerBasic;
 import net.rijento.clockwork_mechanicals.lib.Order;
 import net.rijento.clockwork_mechanicals.lib.filter.Filter;
 
@@ -34,6 +36,7 @@ public class ItemMechanicalConfigurator extends Item
 	public int current_task = 0;
 	public Filter withdrawFilter = new Filter();
 	public Filter depositFilter = new Filter();
+	public InventoryCrafting recipe = new InventoryCrafting(new ContainerBasic(), 3, 3);
 	public ItemMechanicalConfigurator()
 	{
 		this.setMaxStackSize(1);
@@ -237,6 +240,14 @@ public class ItemMechanicalConfigurator extends Item
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
 			stack.getTagCompound().setInteger("current_task", 0);
 		}
+		NBTTagList nbttaglist = new NBTTagList();
+
+        for (int i = 0; i < 9; ++i)
+        {
+            ItemStack itemstack = this.recipe.getStackInSlot(i);
+            nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
+        }
+        stack.getTagCompound().setTag("Recipe", nbttaglist);
 		stack.getTagCompound().setInteger("current_task", this.current_task);
 		stack.getTagCompound().setTag("filterWithdraw", this.withdrawFilter.getFilterNBT());
 		stack.getTagCompound().setTag("filterDeposit", this.depositFilter.getFilterNBT());
@@ -250,34 +261,24 @@ public class ItemMechanicalConfigurator extends Item
 			stack.getTagCompound().setInteger("current_task", 0);
 			stack.getTagCompound().setTag("filterWithdraw", new Filter().getFilterNBT());
 			stack.getTagCompound().setTag("filterDeposit",  new Filter().getFilterNBT());
+			stack.getTagCompound().setTag("Recipe", new NBTTagList());
 		}
+		NBTTagList nbttaglist = stack.getTagCompound().getTagList("Recipe", Constants.NBT.TAG_COMPOUND);
+		for (int i = 0; i < nbttaglist.tagCount() && i < 9; ++i)
+        {
+            ItemStack itemstack = new ItemStack(nbttaglist.getCompoundTagAt(i));
+
+            if (!itemstack.isEmpty())
+            {
+                this.recipe.setInventorySlotContents(i, itemstack);
+            }
+        }
 		this.current_task = stack.getTagCompound().getInteger("current_task");
 		this.withdrawFilter = new Filter(stack.getTagCompound().getCompoundTag("filterWithdraw"));
 		this.depositFilter = new Filter(stack.getTagCompound().getCompoundTag("filterDeposit"));
 	}
 	
 	
-	
-	public void saveCurrentTask(ItemStack stack)
-	{
-		if (!stack.hasTagCompound())
-		{
-			stack.setTagCompound(new NBTTagCompound());
-			stack.getTagCompound().setTag("Orders", new NBTTagList());
-			stack.getTagCompound().setInteger("current_task", 0);
-		}
-		stack.getTagCompound().setInteger("current_task", this.current_task);
-	}
-	public void loadCurrentTask(ItemStack stack)
-	{
-		if (!stack.hasTagCompound())
-		{
-			stack.setTagCompound(new NBTTagCompound());
-			stack.getTagCompound().setTag("Orders", new NBTTagList());
-			stack.getTagCompound().setInteger("current_task", 0);
-		}
-		this.current_task =  stack.getTagCompound().getInteger("current_task");
-	}
 	public int getNumOrders(ItemStack stack)
 	{
 		if (!stack.hasTagCompound())

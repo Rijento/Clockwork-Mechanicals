@@ -7,8 +7,8 @@ import com.google.common.collect.Lists;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.rijento.clockwork_mechanicals.items.ItemMechanicalConfigurator;
@@ -22,6 +22,7 @@ public class ContainerConfigurator extends Container
 	public List<GhostSlot> ghostSlots = Lists.<GhostSlot>newArrayList();
 	public InventoryBasic filterWithdraw;
 	public InventoryBasic filterDeposit;
+	public InventoryCrafting recipe;
 	
 	public ContainerConfigurator(InventoryPlayer playerInventory, ItemStack cnfgIn)
 	{
@@ -29,6 +30,7 @@ public class ContainerConfigurator extends Container
 		this.configuratorStack = cnfgIn;
 		this.filterWithdraw = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.filterInventory;
 		this.filterDeposit = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.filterInventory;
+		this.recipe = ((ItemMechanicalConfigurator)configuratorStack.getItem()).recipe;
 		this.current_task = cnfgIn.getTagCompound().getInteger("current_task");
 		if (this.current_task == 0 || this.current_task == 1 || this.current_task == 2 || this.current_task == 3 || this.current_task == 8)
 		{
@@ -73,7 +75,7 @@ public class ContainerConfigurator extends Container
 				{
 					for (int j = 0; j < 3; ++j)
 					{
-						this.addGhostSlot(new GhostSlot(filterDeposit, j + i * 3, 16 + j * 18, 43 + i * 18));
+						this.addGhostSlot(new GhostSlot(recipe, j + i * 3, 16 + j * 18, 43 + i * 18));
 					}
 				}
 			}
@@ -146,6 +148,16 @@ public class ContainerConfigurator extends Container
 					for (int j = 0; j < 3; ++j)
 					{
 						this.addGhostSlot(new GhostSlot(filterDeposit, j + i * 3, 16 + j * 18, 43 + i * 18));
+					}
+				}
+			}
+			if (this.current_task == 7)
+			{
+				for (int i = 0; i < 3; ++i)
+				{
+					for (int j = 0; j < 3; ++j)
+					{
+						this.addGhostSlot(new GhostSlot(recipe, j + i * 3, 16 + j * 18, 43 + i * 18));
 					}
 				}
 			}

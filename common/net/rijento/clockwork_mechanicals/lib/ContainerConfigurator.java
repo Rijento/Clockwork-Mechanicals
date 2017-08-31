@@ -12,6 +12,8 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.rijento.clockwork_mechanicals.items.ItemMechanicalConfigurator;
+import net.rijento.clockwork_mechanicals.lib.filter.Filter;
+import net.rijento.clockwork_mechanicals.lib.gui.FilterSlot;
 import net.rijento.clockwork_mechanicals.lib.gui.GhostSlot;
 
 public class ContainerConfigurator extends Container
@@ -20,16 +22,16 @@ public class ContainerConfigurator extends Container
 	public final ItemStack configuratorStack;
 	public final InventoryPlayer playerInventory;
 	public List<GhostSlot> ghostSlots = Lists.<GhostSlot>newArrayList();
-	public InventoryBasic filterWithdraw;
-	public InventoryBasic filterDeposit;
+	public Filter filterWithdraw;
+	public Filter filterDeposit;
 	public InventoryCrafting recipe;
 	
 	public ContainerConfigurator(InventoryPlayer playerInventory, ItemStack cnfgIn)
 	{
 		this.playerInventory = playerInventory;
 		this.configuratorStack = cnfgIn;
-		this.filterWithdraw = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.filterInventory;
-		this.filterDeposit = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.filterInventory;
+		filterWithdraw = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter;
+		filterDeposit = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter;
 		this.recipe = ((ItemMechanicalConfigurator)configuratorStack.getItem()).recipe;
 		this.current_task = cnfgIn.getTagCompound().getInteger("current_task");
 		if (this.current_task == 0 || this.current_task == 1 || this.current_task == 2 || this.current_task == 3 || this.current_task == 8)
@@ -55,7 +57,9 @@ public class ContainerConfigurator extends Container
 				{
 					for (int j = 0; j < 3; ++j)
 					{
-						this.addGhostSlot(new GhostSlot(filterWithdraw, j + i * 3, 16 + j * 18, 43 + i * 18));
+						FilterSlot slot = new FilterSlot(filterWithdraw.filterInventory, j + i * 3, 16 + j * 18, 43 + i * 18);
+						this.addGhostSlot(slot);
+						slot.advanced = filterWithdraw.advancedSlots.get(j + i * 3);
 					}
 				}
 			}
@@ -65,7 +69,9 @@ public class ContainerConfigurator extends Container
 				{
 					for (int j = 0; j < 3; ++j)
 					{
-						this.addGhostSlot(new GhostSlot(filterDeposit, j + i * 3, 16 + j * 18, 43 + i * 18));
+						FilterSlot slot = new FilterSlot(filterDeposit.filterInventory, j + i * 3, 16 + j * 18, 43 + i * 18);
+						this.addGhostSlot(slot);
+						slot.advanced = filterDeposit.advancedSlots.get(j + i * 3);
 					}
 				}
 			}
@@ -137,7 +143,9 @@ public class ContainerConfigurator extends Container
 				{
 					for (int j = 0; j < 3; ++j)
 					{
-						this.addGhostSlot(new GhostSlot(filterWithdraw, j + i * 3, 16 + j * 18, 43 + i * 18));
+						FilterSlot slot = new FilterSlot(filterWithdraw.filterInventory, j + i * 3, 16 + j * 18, 43 + i * 18);
+						this.addGhostSlot(slot);
+						slot.advanced = filterWithdraw.advancedSlots.get(j + i * 3);
 					}
 				}
 			}
@@ -147,7 +155,9 @@ public class ContainerConfigurator extends Container
 				{
 					for (int j = 0; j < 3; ++j)
 					{
-						this.addGhostSlot(new GhostSlot(filterDeposit, j + i * 3, 16 + j * 18, 43 + i * 18));
+						FilterSlot slot = new FilterSlot(filterDeposit.filterInventory, j + i * 3, 16 + j * 18, 43 + i * 18);
+						this.addGhostSlot(slot);
+						slot.advanced = filterDeposit.advancedSlots.get(j + i * 3);
 					}
 				}
 			}

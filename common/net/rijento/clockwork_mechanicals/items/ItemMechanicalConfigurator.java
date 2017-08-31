@@ -239,6 +239,9 @@ public class ItemMechanicalConfigurator extends Item
 			stack.setTagCompound(new NBTTagCompound());
 			stack.getTagCompound().setTag("Orders", new NBTTagList());
 			stack.getTagCompound().setInteger("current_task", 0);
+			stack.getTagCompound().setTag("filterWithdraw", new Filter().getFilterNBT());
+			stack.getTagCompound().setTag("filterDeposit",  new Filter().getFilterNBT());
+			stack.getTagCompound().setTag("Recipe", new NBTTagList());
 		}
 		NBTTagList nbttaglist = new NBTTagList();
 
@@ -291,6 +294,6 @@ public class ItemMechanicalConfigurator extends Item
 	}
 	public int getComplexity(ItemStack stack)
 	{
-		return getNumOrders(stack) % 5;
+		return getNumOrders(stack) / 5;
 	}
 }

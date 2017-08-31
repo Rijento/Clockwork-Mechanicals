@@ -24,6 +24,17 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 		this.runDelay = 20;
 	}
 	
+	public boolean shouldUpdate()
+	{
+		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+		else if (!(this.theMechanical.getTension()-0.1F>0)){return false;}
+		else if (this.theMechanical.isWinding == true){return false;}
+		else if (this.theMechanical.isWet()){return false;}
+		else if (this.runDelay > 0){return false;}
+        else{return true;}
+	}
+	
+	@Override
 	public boolean shouldExecute()
     {
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
@@ -43,6 +54,7 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
         }
     }
 	
+	@Override
 	public boolean continueExecuting()
     {
 		if (this.theMechanical.isWinding == true){return false;}
@@ -56,6 +68,7 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 		}
     }
 	
+	@Override
 	public void startExecuting()
     {
         this.theMechanical.getNavigator().tryMoveToXYZ((double)((float)this.destinationBlock.getX()), (double)(this.destinationBlock.getY() + 1), (double)((float)this.destinationBlock.getZ()), this.movementSpeed);
@@ -63,9 +76,11 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
         this.runDelay = 20;
     }
 	
+	@Override
 	public void updateTask()
     {
-        if (this.theMechanical.getDistanceSqToCenter(this.destinationBlock) > 2.0D)
+		if (!this.shouldUpdate()){return;}
+        if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.destinationBlock)) > 0.75D)
         {
             this.isAboveDestination = false;
             ++this.timeoutCounter;

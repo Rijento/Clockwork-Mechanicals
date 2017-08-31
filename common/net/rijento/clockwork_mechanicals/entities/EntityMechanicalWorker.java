@@ -143,17 +143,6 @@ public class EntityMechanicalWorker extends EntityGolem
 				EntityAIMechanicalHarvestFarmland taskHarvest = new EntityAIMechanicalHarvestFarmland(this, order.pos, i);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskHarvest);
-				KeepAmnt keepSeeds = new KeepAmnt(new ItemStack(Items.WHEAT_SEEDS), 10);
-				KeepAmnt keepSeeds1 = new KeepAmnt(new ItemStack(Items.BEETROOT_SEEDS), 10);
-				KeepAmnt keepSeeds2 = new KeepAmnt(new ItemStack(Items.CARROT), 10);
-				KeepAmnt keepSeeds3 = new KeepAmnt(new ItemStack(Items.POTATO), 10);
-				if (!this.filters.contains(keepSeeds))
-				{
-					this.filters.add(keepSeeds);
-					this.filters.add(keepSeeds1);
-					this.filters.add(keepSeeds2);
-					this.filters.add(keepSeeds3);
-				}
 				continue;
 			case "dropoff":
 				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i, order.filter);
@@ -177,22 +166,10 @@ public class EntityMechanicalWorker extends EntityGolem
 				EntityAIMechanicalChop taskChop = new EntityAIMechanicalChop(this, order.pos, i);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskChop);
-				ItemStack temp = new ItemStack(Blocks.SAPLING);
-				KeepAmnt keepSaplings = new KeepAmnt(temp, 10);
-				if (!this.filters.contains(keepSaplings))
-				{
-					this.filters.add(keepSaplings);
-				}
 				continue;
 			case "mine":
 				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, order.facing, true, i);
 				this.tasks.addTask(i, taskMine);
-				KeepAmnt keepTorches = new KeepAmnt(new ItemStack(Blocks.TORCH), 64);
-				KeepAmnt keepPickaxe = new KeepAmnt(new ItemStack(Items.WOODEN_PICKAXE), 1);
-				if (!this.filters.contains(keepTorches))
-				{
-					this.filters.add(keepTorches);
-				}
 				continue;
 			}
 		}

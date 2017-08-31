@@ -19,7 +19,7 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	private final BlockPos targetInventory;
 	private final static int maxruntime = 100;
 	private int runtime;
-	private boolean fullyempty = true;
+	private boolean fullyFill = true;
 	private int transferTime;
 	private Filter filter;
 	
@@ -34,6 +34,16 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 		}
 		if (filterIn != null){this.filter = filterIn;}
 	}
+	
+	public boolean shouldUpdate()
+	{
+		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+		else if (!(this.theMechanical.getTension()-0.05F>0)){return false;}
+		else if (this.theMechanical.isWinding == true){return false;}
+		else if (this.theMechanical.isWet()){return false;}
+		else{return true;}
+	}
+	
 	@Override
 	public boolean shouldExecute() {
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
@@ -50,7 +60,7 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	public boolean continueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
-		if (this.fullyempty == true)
+		if (this.fullyFill == true)
 		{
 			if (this.checkFull() == true)
 			{
@@ -83,9 +93,10 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	@Override
 	public void updateTask()
     {
+		if (!this.shouldUpdate()){return;}
 		TileEntity te = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
 		if (!(te instanceof IInventory)){this.runtime++; return;}
-		else if (this.theMechanical.getDistanceSqToCenter(this.targetInventory) > 3.0D){return;}
+		else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.targetInventory)) > 1.75D){return;}
 		else
 		{
 			IInventory InventoryIn = ((IInventory)te);
@@ -99,30 +110,22 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
                     Item item = InventoryIn.getStackInSlot(i).getItem();
                     int flag = 1;
                     if (filter != null){
-	                    if (!filter.filterStatisfied(itemstack))
+	                    if (!filter.filterStatisfied(itemstack, mechainicalInventory, InventoryIn))
 	                    {
 	                    	this.runtime++;
 	                    	continue;
 	                    }
                     }
-                    for (KeepAmnt filter : this.theMechanical.filters)
+                    
+                    ItemStack itemstack1 = putStackInInventoryAllSlots(InventoryIn, mechainicalInventory, new ItemStack(item, 1, itemstack.getMetadata()));
+                    if (itemstack1.isEmpty())
                     {
-                		flag = filter.filterStatified(itemstack, mechainicalInventory);
-                		if (flag == 0){break;}
-                    }
-                    if (!(flag == 0))
-                    {
-	                    ItemStack itemstack1 = putStackInInventoryAllSlots(InventoryIn, mechainicalInventory, new ItemStack(item, 1, itemstack.getMetadata()));
-	                    
-	                    if (itemstack1.isEmpty())
-	                    {
-	                    	itemstack.shrink(1);
-	                    	this.theMechanical.unwind(0.05F);
-	                    	InventoryIn.markDirty();
-	                        mechainicalInventory.markDirty();
-	                        this.runtime = 0;
-	                        break;
-	                    }
+                    	itemstack.shrink(1);
+                    	this.theMechanical.unwind(0.05F);
+                    	InventoryIn.markDirty();
+                        mechainicalInventory.markDirty();
+                        this.runtime = 0;
+                        break;
                     }
                 }
             }

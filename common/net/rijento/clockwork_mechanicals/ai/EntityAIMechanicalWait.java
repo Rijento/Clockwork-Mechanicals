@@ -22,6 +22,14 @@ public class EntityAIMechanicalWait extends EntityAIBase
         this.priority = priorityIn;
         this.setMutexBits(3);
     }
+    
+    public boolean shouldUpdate()
+    {
+    	if (this.idleEntity.isWinding == true){return false;}
+    	else if (this.idleEntity.isWet()){return false;}
+    	else if (this.priority == this.idleEntity.getCurrentTask()){return true;}
+    	else{return false;}
+    }
 
     /**
      * Returns whether the EntityAIBase should begin execution.
@@ -56,6 +64,8 @@ public class EntityAIMechanicalWait extends EntityAIBase
      */
     public void updateTask()
     {
+    	if(!this.shouldUpdate()){return;}
+    	if (this.priority != this.idleEntity.getCurrentTask()){return;}
         --this.idleTime;
     }
 }

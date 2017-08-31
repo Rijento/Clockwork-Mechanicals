@@ -2,18 +2,13 @@ package net.rijento.clockwork_mechanicals.lib.gui;
 
 import java.io.IOException;
 
-import javax.annotation.Nullable;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
+import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -107,7 +102,7 @@ public class GuiConfiguratorBase extends GuiContainer
 	        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 	        for (GhostSlot slot : ((ContainerConfigurator)this.inventorySlots).ghostSlots)
 			{
-				drawGhostSlot(slot, mouseX, mouseY);
+	        	slot.draw(this.mc, itemRender, guiLeft, guiTop, mouseX, mouseY);
 			}
 			fontRendererObj.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
 			return;
@@ -122,7 +117,7 @@ public class GuiConfiguratorBase extends GuiContainer
 	        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 	        for (GhostSlot slot : ((ContainerConfigurator)this.inventorySlots).ghostSlots)
 			{
-				drawGhostSlot(slot, mouseX, mouseY);
+	        	slot.draw(this.mc, itemRender, guiLeft, guiTop, mouseX, mouseY);
 			}
 			fontRendererObj.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
 			return;
@@ -137,7 +132,7 @@ public class GuiConfiguratorBase extends GuiContainer
 	        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 	        for (GhostSlot slot : ((ContainerConfigurator)this.inventorySlots).ghostSlots)
 			{
-				drawGhostSlot(slot, mouseX, mouseY);
+	        	slot.draw(this.mc, itemRender, guiLeft, guiTop, mouseX, mouseY);
 			}
 			return;
 		}
@@ -276,43 +271,6 @@ public class GuiConfiguratorBase extends GuiContainer
 		super.drawScreen(mouseX, mouseY, partialTicks);
     }
 	
-	public void drawGhostSlot(GhostSlot slotIn, int mouseX, int mouseY)
-    {
-		zLevel = 0.0F;
-	    itemRender.zLevel = -25.0F;
-	    GL11.glEnable(GL11.GL_LIGHTING);
-	    GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-	    GL11.glEnable(GL11.GL_DEPTH_TEST);
-	    RenderHelper.enableGUIStandardItemLighting();
-	    ItemStack stack = slotIn.getStack();
-	    if (stack != null)
-	    {
-	    	itemRender.renderItemAndEffectIntoGUI(stack, slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1);
-	    	GL11.glDisable(GL11.GL_LIGHTING);
-	        GL11.glDisable(GL11.GL_DEPTH_TEST);
-	        GL11.glEnable(GL11.GL_BLEND);
-	        GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.3F);
-        	this.mc.getTextureManager().bindTexture(withdrawTexture);
-	        drawGradientRect(slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1, slotIn.xPos + guiLeft + 16 + 1, slotIn.yPos + guiTop + 16 + 1, 0x608B8B8B, 0x608B8B8B);
-	        GL11.glEnable(GL11.GL_DEPTH_TEST);
-	        GL11.glEnable(GL11.GL_LIGHTING);
-	    }
-	    if (slotIn.isMouseOver(mouseX - guiLeft, mouseY - guiTop))
-	    {
-	    	GL11.glDisable(GL11.GL_LIGHTING);
-	        GL11.glDisable(GL11.GL_DEPTH_TEST);
-	        GL11.glColorMask(true, true, true, true);
-	        GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.3F);
-	        drawGradientRect(slotIn.xPos + guiLeft + 1, slotIn.yPos + guiTop + 1, slotIn.xPos + guiLeft + 16 + 1, slotIn.yPos + guiTop + 16 + 1, 0x80FFFFFF, 0x80FFFFFF);
-	        GL11.glColorMask(true, true, true, true);
-	        GL11.glEnable(GL11.GL_DEPTH_TEST);
-	        GL11.glEnable(GL11.GL_LIGHTING);
-	    }
-	    GL11.glDisable(GL11.GL_LIGHTING);
-	    itemRender.zLevel = 0.0F;
-	    zLevel = 0.0F;
-    }
-	
 	@Override
 	protected void mouseClicked(int x, int y, int button) throws IOException
 	{
@@ -323,36 +281,52 @@ public class GuiConfiguratorBase extends GuiContainer
 				ItemStack handStack = Minecraft.getMinecraft().player.inventory.getItemStack();
 
 			    ItemStack existingStack = slot.getStack();
-			    if (handStack == null || handStack.getItem() == null || handStack.getCount() == 0)
-			    { // empty hand
-			        slot.putStack(ItemStack.EMPTY);
-			    } 
-			    else 
-			    { // item in hand
-			        if (existingStack == null || existingStack.getItem() == null || existingStack.getCount() == 0)
-			        { // empty slot
-			        	slot.putStack(handStack);
-			        } 
-			        else
-			        { // filled slot
-			        	if (ItemStack.areItemsEqual(existingStack, handStack) && ItemStack.areItemStackTagsEqual(existingStack, handStack))
-			        	{ // same item
-				            if (existingStack.getCount() < existingStack.getMaxStackSize() && existingStack.getCount() < slot.getSlotStackLimit())
-				            {
-				            	existingStack.grow(handStack.getCount());;
-				            } 
-				            else 
-				            {
-				              // NOP
+			    if(!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
+			    {
+				    if ((handStack == null || handStack.getItem() == null || handStack.getCount() == 0))
+				    { // empty hand
+				        slot.putStack(ItemStack.EMPTY);
+				    } 
+				    else 
+				    { // item in hand
+				        if (existingStack == null || existingStack.getItem() == null || existingStack.getCount() == 0)
+				        { // empty slot
+				        	slot.putStack(handStack);
+				        } 
+				        else
+				        { // filled slot
+				        	if (ItemStack.areItemsEqual(existingStack, handStack) && ItemStack.areItemStackTagsEqual(existingStack, handStack))
+				        	{ // same item
+					            if (existingStack.getCount() < existingStack.getMaxStackSize() && existingStack.getCount() < slot.getSlotStackLimit())
+					            {
+					            	existingStack.grow(handStack.getCount());;
+					            } 
+					            else 
+					            {
+					              // NOP
+					            }
+	   			            } 
+				        	else 
+	   			            { // different item
+				                slot.putStack(handStack);
 				            }
-   			            } 
-			        	else 
-   			            { // different item
-			                slot.putStack(handStack);
-			            }
-			        }
+				        }
+				    }
+			    }
+			    else
+			    { //Switch to/from filter slot
+			    	slot.advancedToggle();
+			    	if (this.selected == 5)
+			    	{
+			    		((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.advancedSlots.set(slot.getSlotIndex(), slot.advancedState());
+			    	}
+			    	else if (this.selected == 6)
+			    	{
+			    		((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.advancedSlots.set(slot.getSlotIndex(), slot.advancedState());
+			    	}
 			    }
 			}
+			slot.mouseClicked(x, y);
 		}
 		
 		super.mouseClicked(x, y, button);

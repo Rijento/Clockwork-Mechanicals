@@ -35,6 +35,16 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		}
 		if (filterIn != null){this.filter = filterIn;}
 	}
+	
+	public boolean shouldUpdate()
+	{
+		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+		else if (!(this.theMechanical.getTension()-0.15F>0)){return false;}
+		else if (this.theMechanical.isWinding == true){return false;}
+		else if (this.theMechanical.isWet()){return false;}
+		else{return true;}
+	}
+	
 	@Override
 	public boolean shouldExecute() {
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
@@ -51,19 +61,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	public boolean continueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
-		if (this.fullyempty == true)
-		{
-			if (this.checkEmpty() == true)
-			{
-				if (this.runtime >= this.maxruntime)
-				{
-					this.theMechanical.nextTask();
-					this.runtime = 0;
-					return false;
-				}
-			}
-			else{return true;}
-		}
+		if (this.fullyempty == true){return true;}
 		else if (this.runtime >= this.maxruntime)
 		{
 			this.theMechanical.nextTask();
@@ -77,8 +75,9 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	@Override
 	public void updateTask()
     {
+		if (!this.shouldUpdate()){return;}
 		TileEntity te = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
-		if (this.theMechanical.getDistanceSqToCenter(this.targetInventory) > 3.0D){return;}
+		if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.targetInventory)) > 1.75D){return;}
 		else if (!(te instanceof IInventory)){this.runtime++; return;}
 		else
 		{
@@ -92,31 +91,29 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                     ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
                     Item item = mechainicalInventory.getStackInSlot(i).getItem();
                     if (filter != null){
-	                    if (!filter.filterStatisfied(itemstack))
+	                    if (!filter.filterStatisfied(itemstack, InventoryOut, mechainicalInventory))
 	                    {
 	                    	this.runtime++;
 	                    	continue;
 	                    }
                     }
-                    int flag = 1;
-                    for (KeepAmnt filter : this.theMechanical.filters)
+                    
+                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, InventoryOut, new ItemStack(item, 1, itemstack.getMetadata()));
+                    if (itemstack1.isEmpty())
                     {
-                    	flag = filter.filterStatified(itemstack, mechainicalInventory);
-                    	if (flag == 0){break;}
+                    	itemstack.shrink(1);
+                    	this.theMechanical.unwind(0.05F);
+                    	this.runtime = 0;
+                    	InventoryOut.markDirty();
+                        break;
                     }
-                    if (!(flag == 0))
-                    {
-	                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, InventoryOut, new ItemStack(item, 1, itemstack.getMetadata()));
-	                    
-	                    if (itemstack1.isEmpty())
-	                    {
-	                    	itemstack.shrink(1);
-	                    	this.theMechanical.unwind(0.05F);
-	                    	this.runtime = 0;
-	                    	InventoryOut.markDirty();
-	                        break;
-	                    }
-                    }
+                }
+                
+                if (i+1 == size)
+                {
+                	this.theMechanical.nextTask();
+        			this.runtime = 0;
+        			return;
                 }
             }
 			this.runtime++;
@@ -154,36 +151,4 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
     {
         return stack1.getItem() != stack2.getItem() ? false : (stack1.getMetadata() != stack2.getMetadata() ? false : (stack1.getCount() > stack1.getMaxStackSize() ? false : ItemStack.areItemStackTagsEqual(stack1, stack2)));
     }
-	
-	private boolean checkEmpty()
-	{
-		if (this.theMechanical.getMechanicalInventory().isEmpty()){return true;}
-		if (this.theMechanical.filters.isEmpty())
-		{
-			return this.theMechanical.getMechanicalInventory().isEmpty();
-		}
-		else
-		{
-			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
-			int size = this.theMechanical.getMechanicalInventory().getSizeInventory();
-			for (int i = 0; i < size; ++i)
-            {
-                if (!mechainicalInventory.getStackInSlot(i).isEmpty())
-                {
-                    ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
-                    int flag = 1;
-                    for (KeepAmnt filter : this.theMechanical.filters)
-                    {
-                    	flag = filter.filterStatified(itemstack, mechainicalInventory);
-                    	if (flag == 1){return false;}
-                    }
-                    if (flag == -1)
-                    {
-                    	return false;
-                    }
-                }
-            }
-			return true;
-		}
-	}
 }

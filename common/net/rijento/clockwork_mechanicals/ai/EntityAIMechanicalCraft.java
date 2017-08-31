@@ -29,6 +29,17 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 		this.runDelay = 20;
 	}
 	
+	public boolean shouldUpdate()
+	{
+		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+		else if (!(this.theMechanical.getTension()-0.25F>0)){return false;}
+		else if (this.theMechanical.isWinding == true){return false;}
+		else if (this.theMechanical.isWet()){return false;}
+		else if (this.runtime > this.maxruntime){return false;}
+		else if (this.runDelay > 0){return false;}
+        else{return true;}
+	}
+	
 	@Override
 	public boolean shouldExecute() {
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
@@ -57,6 +68,7 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 	
 	public void updateTask()
     {
+		if (!this.shouldUpdate()){return;}
 		this.attemptCraft();
 		runtime++;
     }

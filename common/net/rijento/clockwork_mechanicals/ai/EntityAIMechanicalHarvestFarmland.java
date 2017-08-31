@@ -34,13 +34,23 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
+    public boolean shouldUpdate()
+    {
+    	if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+    	else if (this.theMechanical.isWinding == true){return false;}
+    	else if (this.theMechanical.getTension()-0.25F < 0){return false;}
+    	else if (this.theMechanical.isWet()){return false;}
+    	else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.position.up())) <= 0.7D){return true;}
+    	else{return false;}
+    }
+    
     public boolean shouldExecute()
     {
     	if (this.priority != this.theMechanical.getCurrentTask()){return false;}
     	else if (this.theMechanical.isWinding == true){return false;}
     	else if (this.theMechanical.getTension()-0.25F < 0){return false;}
     	else if (this.theMechanical.isWet()){return false;}
-    	else if (this.theMechanical.getDistanceSqToCenter(this.position.up()) <= 0.6D)
+    	else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.position.up())) <= 0.7D)
     	{
 	    	this.currentTask = -1;
 	    	this.determineTask(this.theMechanical.getEntityWorld());
@@ -65,6 +75,7 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
      */
     public void updateTask()
     {
+    	if (!this.shouldUpdate()){return;}
         World world = this.theMechanical.world;
         BlockPos blockpos = this.position.up();//this.theMechanical.getPosition();
         IBlockState iblockstate = world.getBlockState(blockpos);
@@ -113,7 +124,7 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
                 }
             }
         }
-        if (this.theMechanical.getDistanceSqToCenter(this.position.up()) <= 0.6D && this.currentTask == -1)
+        if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.position.up())) <= 0.7D && this.currentTask == -1)
         {
         	this.theMechanical.nextTask();
         }

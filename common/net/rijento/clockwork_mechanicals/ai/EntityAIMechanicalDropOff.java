@@ -2,11 +2,15 @@ package net.rijento.clockwork_mechanicals.ai;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
@@ -20,7 +24,6 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	private final BlockPos targetInventory;
 	private final static int maxruntime = 100;
 	private int runtime;
-	private boolean fullyempty = true;
 	private int transferTime;
 	private Filter filter;
 	
@@ -42,6 +45,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		else if (!(this.theMechanical.getTension()-0.15F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
+		else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.targetInventory)) > 1.75D){return false;}
 		else{return true;}
 	}
 	
@@ -61,7 +65,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	public boolean continueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
-		if (this.fullyempty == true){return true;}
+		//if (this.fullyempty == true){return true;}
 		else if (this.runtime >= this.maxruntime)
 		{
 			this.theMechanical.nextTask();
@@ -76,12 +80,27 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	public void updateTask()
     {
 		if (!this.shouldUpdate()){return;}
-		TileEntity te = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
+		IBlockState state = this.theMechanical.getEntityWorld().getBlockState(targetInventory);
+		Block block = state.getBlock();
+		IInventory InventoryOut = null;
+		
+		if (block.hasTileEntity(state))
+        {
+            TileEntity tileentity = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
+            if (tileentity instanceof IInventory)
+            {
+                InventoryOut = (IInventory)tileentity;
+
+                if (InventoryOut instanceof TileEntityChest && block instanceof BlockChest)
+                {
+                	InventoryOut = ((BlockChest)block).getContainer(this.theMechanical.getEntityWorld(), targetInventory, true);
+                }
+            }
+        }
+		else{this.runtime++; return;}
 		if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.targetInventory)) > 1.75D){return;}
-		else if (!(te instanceof IInventory)){this.runtime++; return;}
 		else
 		{
-			IInventory InventoryOut = ((IInventory)te);
 			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
 			int size = this.theMechanical.getMechanicalInventory().getSizeInventory();
 			for (int i = 0; i < size; ++i)
@@ -107,13 +126,6 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                     	InventoryOut.markDirty();
                         break;
                     }
-                }
-                
-                if (i+1 == size)
-                {
-                	this.theMechanical.nextTask();
-        			this.runtime = 0;
-        			return;
                 }
             }
 			this.runtime++;
@@ -147,6 +159,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		
 		return itemStack;
 	}
+	
 	private static boolean canCombine(ItemStack stack1, ItemStack stack2)
     {
         return stack1.getItem() != stack2.getItem() ? false : (stack1.getMetadata() != stack2.getMetadata() ? false : (stack1.getCount() > stack1.getMaxStackSize() ? false : ItemStack.areItemStackTagsEqual(stack1, stack2)));

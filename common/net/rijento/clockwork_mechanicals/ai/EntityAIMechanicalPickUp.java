@@ -2,16 +2,19 @@ package net.rijento.clockwork_mechanicals.ai;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.filter.Filter;
-import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
 
 public class EntityAIMechanicalPickUp extends EntityAIBase {
 	private final EntityMechanicalWorker theMechanical;
@@ -19,7 +22,6 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	private final BlockPos targetInventory;
 	private final static int maxruntime = 100;
 	private int runtime;
-	private boolean fullyFill = true;
 	private int transferTime;
 	private Filter filter;
 	
@@ -60,26 +62,6 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	public boolean continueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
-		if (this.fullyFill == true)
-		{
-			if (this.checkFull() == true)
-			{
-				if (this.runtime >= this.maxruntime)
-				{
-					this.theMechanical.nextTask();
-					this.runtime = 0;
-					return false;
-				}
-			}
-			else{
-				if (this.runtime >= this.maxruntime)
-				{
-					this.theMechanical.nextTask();
-					this.runtime = 0;
-					return false;
-				}
-			}
-		}
 		else if (this.runtime >= this.maxruntime)
 		{
 			this.theMechanical.nextTask();
@@ -94,12 +76,27 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	public void updateTask()
     {
 		if (!this.shouldUpdate()){return;}
-		TileEntity te = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
-		if (!(te instanceof IInventory)){this.runtime++; return;}
-		else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.targetInventory)) > 1.75D){return;}
+		IBlockState state = this.theMechanical.getEntityWorld().getBlockState(targetInventory);
+		Block block = state.getBlock();
+		IInventory InventoryIn = null;
+		
+		if (block.hasTileEntity(state))
+        {
+            TileEntity tileentity = this.theMechanical.getEntityWorld().getTileEntity(targetInventory);
+            if (tileentity instanceof IInventory)
+            {
+                InventoryIn = (IInventory)tileentity;
+
+                if (InventoryIn instanceof TileEntityChest && block instanceof BlockChest)
+                {
+                	InventoryIn = ((BlockChest)block).getContainer(this.theMechanical.getEntityWorld(), targetInventory, true);
+                }
+            }
+        }
+		else{this.runtime++; return;}
+		if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.targetInventory)) > 1.75D){return;}
 		else
 		{
-			IInventory InventoryIn = ((IInventory)te);
 			IInventory mechainicalInventory = this.theMechanical.getMechanicalInventory();
 			int size = InventoryIn.getSizeInventory();
 			for (int i = 0; i < size; ++i)

@@ -149,7 +149,6 @@ class IncrementButton extends GuiButton
 		if (this.visible)
         {
 			this.zLevel = 150;
-            FontRenderer fontrenderer = mc.fontRendererObj;
             mc.getTextureManager().bindTexture(TEXTURE);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.hovered = mouseX >= this.xPosition + guiLeft && mouseY >= this.yPosition + guiTop && mouseX < this.xPosition + guiLeft + this.width && mouseY < this.yPosition + guiTop + this.height;
@@ -188,7 +187,6 @@ class DecrementButton extends GuiButton
 		if (this.visible)
         {
 			this.zLevel = 150;
-			FontRenderer fontrenderer = mc.fontRendererObj;
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.hovered = mouseX >= this.xPosition + guiLeft && mouseY >= this.yPosition + guiTop && mouseX < this.xPosition + guiLeft + this.width && mouseY < this.yPosition + guiTop + this.height;
             mc.getTextureManager().bindTexture(texture);

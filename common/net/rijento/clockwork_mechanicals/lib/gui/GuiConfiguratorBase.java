@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -58,28 +59,28 @@ public class GuiConfiguratorBase extends GuiContainer
         int i = (this.width - this.xSize) / 2;
         int j = (this.height - this.ySize) / 2;
         buttonList.clear();
-        buttonList.add(buttonHarvest = new Button(1,i+16,j+7));
-        buttonList.add(buttonChop = new Button(2,i+34,j+7));
-        buttonList.add(buttonSlay = new Button(3,i+52,j+7));
-        buttonList.add(buttonMine = new Button(4,i+70,j+7));
-        buttonList.add(buttonTake = new Button(5,i+88,j+7));
-        buttonList.add(buttonDeposit = new Button(6,i+106,j+7));
+        buttonList.add(buttonHarvest = new Button(1,i+16,j+7,"Harvest"));
+        buttonList.add(buttonChop = new Button(2,i+34,j+7,"Chop"));
+        buttonList.add(buttonSlay = new Button(3,i+52,j+7,"Attack"));
+        buttonList.add(buttonMine = new Button(4,i+70,j+7,"Mine"));
+        buttonList.add(buttonTake = new Button(5,i+88,j+7,"Withdraw"));
+        buttonList.add(buttonDeposit = new Button(6,i+106,j+7,"Deposit"));
         
         if (selected == 5)
         {
         	if (buttonBlackWhite1 == null){buttonList.add(buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
-        	else{buttonList.add(buttonBlackWhite1);}
+        	else{buttonList.add(buttonBlackWhite1); buttonBlackWhite1.xPosition=guiLeft + 88; buttonBlackWhite1.yPosition=((this.height - 222) / 2) + 43;}
         	buttonBlackWhite1.BoW = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.Whitelist;
         }
         if (selected == 6)
         {
         	if (buttonBlackWhite2 == null){buttonList.add(buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
-        	else{buttonList.add(buttonBlackWhite2);}
+        	else{buttonList.add(buttonBlackWhite2);buttonBlackWhite2.xPosition=guiLeft + 88; buttonBlackWhite2.yPosition=((this.height - 222) / 2) + 43;}
         	buttonBlackWhite2.BoW = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.Whitelist;
         }
         
-        buttonList.add(buttonCraft = new Button(7,i+124,j+7));
-        buttonList.add(buttonWind = new Button(8,i+142,j+7));
+        buttonList.add(buttonCraft = new Button(7,i+124,j+7,"Craft"));
+        buttonList.add(buttonWind = new Button(8,i+142,j+7,"Wind"));
         
     }
 
@@ -340,14 +341,22 @@ public class GuiConfiguratorBase extends GuiContainer
 	static class Button extends GuiButton
 	{
 
-		public Button(int buttonId, int x, int y) {
-			super(buttonId, x, y, 18, 18, "");
+		public Button(int buttonId, int x, int y, String displayIn) {
+			super(buttonId, x, y, 18, 18, displayIn);
 		}
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY)
+        public void drawButton(Minecraft mc, int mouseX, int mouseY)
         {
-			
-        }
+			FontRenderer fontrenderer = mc.fontRendererObj;
+            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+            int j = 14737632;
+            if (this.hovered)
+            {
+            	this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition - (this.height - 8) / 2, j);
+            }
+
+            
+    }
 	}
 	@SideOnly (Side.CLIENT)
 	static class ButtonBW extends GuiButton

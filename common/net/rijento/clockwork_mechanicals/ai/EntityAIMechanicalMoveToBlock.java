@@ -30,7 +30,6 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
 		else if (!(this.theMechanical.getTension()-0.1F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
-		else if (this.runDelay > 0){return false;}
         else{return true;}
 	}
 	

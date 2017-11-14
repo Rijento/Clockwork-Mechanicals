@@ -1,8 +1,6 @@
 package net.rijento.clockwork_mechanicals.lib;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import org.lwjgl.opengl.GL11;
 
@@ -10,17 +8,12 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.model.ModelChest;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -52,7 +45,7 @@ public class MechanicalEventsClient
             
 
             Tessellator tessellator = Tessellator.getInstance();
-            VertexBuffer buffer = tessellator.getBuffer();
+            BufferBuilder buffer = tessellator.getBuffer();
 
             double offsetX = player.prevPosX + (player.posX - player.prevPosX) * (double) partialTicks;
             double offsetY = player.prevPosY + (player.posY - player.prevPosY) * (double) partialTicks;
@@ -121,7 +114,7 @@ public class MechanicalEventsClient
 	            	TextureAtlasSprite spriteUp = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/farmland_wet");
 	            	TextureAtlasSprite spriteWest = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/dirt");
                 
-	                AxisAlignedBB boundingBox = new AxisAlignedBB(renderX, renderY, renderZ, renderX + 1, renderY + 1, renderZ + 1).expand(-0.2, -0.2, -0.2);
+	                AxisAlignedBB boundingBox = new AxisAlignedBB(renderX+1.075, renderY+1.075, renderZ+1.075, renderX + 0.125, renderY + 0.125, renderZ + 0.125).contract(0.2, 0.2, 0.2);
 	                //Up
 	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spriteUp.getInterpolatedU(16), spriteUp.getInterpolatedV(16)).endVertex();
@@ -180,7 +173,7 @@ public class MechanicalEventsClient
 	            	spriteWest = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/crafting_table_side");
 	            	
                 
-	                boundingBox = new AxisAlignedBB(renderX, renderY, renderZ, renderX + 1, renderY + 1, renderZ + 1).expand(-0.2, -0.2, -0.2);
+	                boundingBox = new AxisAlignedBB(renderX+1.075, renderY+1.075, renderZ+1.075, renderX + 0.125, renderY + 0.125, renderZ + 0.125).contract(0.2, 0.2, 0.2);
 	                //Up
 	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spriteUp.getInterpolatedU(16), spriteUp.getInterpolatedV(16)).endVertex();
@@ -238,7 +231,7 @@ public class MechanicalEventsClient
 	            	spriteWest = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/log_oak");
 	            	
                 
-	                boundingBox = new AxisAlignedBB(renderX, renderY, renderZ, renderX + 1, renderY + 1, renderZ + 1).expand(-0.2, -0.2, -0.2);
+	                boundingBox = new AxisAlignedBB(renderX+1.075, renderY+1.075, renderZ+1.075, renderX + 0.125, renderY + 0.125, renderZ + 0.125).contract(0.2, 0.2, 0.2);
 	                //Up
 	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spriteUp.getInterpolatedU(16), spriteUp.getInterpolatedV(16)).endVertex();
@@ -297,7 +290,7 @@ public class MechanicalEventsClient
 	            	spriteWest = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite("minecraft:blocks/stone");
 	            	
 	            
-	                boundingBox = new AxisAlignedBB(renderX, renderY, renderZ, renderX + 1, renderY + 1, renderZ + 1).expand(-0.2, -0.2, -0.2);
+	                boundingBox = new AxisAlignedBB(renderX+1.075, renderY+1.075, renderZ+1.075, renderX + 0.125, renderY + 0.125, renderZ + 0.125).contract(0.2, 0.2, 0.2);
 	                //Up
 	                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 	                buffer.pos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ).tex(spriteUp.getInterpolatedU(16), spriteUp.getInterpolatedV(16)).endVertex();

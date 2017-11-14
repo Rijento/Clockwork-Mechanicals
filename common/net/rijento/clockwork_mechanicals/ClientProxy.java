@@ -27,7 +27,6 @@ public class ClientProxy extends CommonProxy {
 		super.init(event);
 		
 		MinecraftForge.EVENT_BUS.register(new MechanicalEventsClient());
-		ModItems.initClient(Minecraft.getMinecraft().getRenderItem().getItemModelMesher());
 	}
 	
 	@Override

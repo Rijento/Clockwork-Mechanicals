@@ -53,7 +53,7 @@ public class FilterSlot extends GhostSlot {
 		    if (stack != null)
 		    {
 		    	itemRender.renderItemAndEffectIntoGUI(stack, this.xPos + guiLeft + 1, this.yPos + guiTop + 1);
-		    	itemRender.renderItemOverlays(mc.fontRendererObj, stack, this.xPos + guiLeft + 1, this.yPos + guiTop + 1);
+		    	itemRender.renderItemOverlays(mc.fontRenderer, stack, this.xPos + guiLeft + 1, this.yPos + guiTop + 1);
 		    	GL11.glDisable(GL11.GL_LIGHTING);
 		        GL11.glDisable(GL11.GL_DEPTH_TEST);
 		        GL11.glEnable(GL11.GL_BLEND);
@@ -151,8 +151,8 @@ class IncrementButton extends GuiButton
 			this.zLevel = 150;
             mc.getTextureManager().bindTexture(TEXTURE);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            this.hovered = mouseX >= this.xPosition + guiLeft && mouseY >= this.yPosition + guiTop && mouseX < this.xPosition + guiLeft + this.width && mouseY < this.yPosition + guiTop + this.height;
-            this.drawTexturedModalRect(this.xPosition + guiLeft, this.yPosition + guiTop, 0, 0, 5, 5);
+            this.hovered = mouseX >= this.x + guiLeft && mouseY >= this.y + guiTop && mouseX < this.x + guiLeft + this.width && mouseY < this.y + guiTop + this.height;
+            this.drawTexturedModalRect(this.x + guiLeft, this.y + guiTop, 0, 0, 5, 5);
             this.mouseDragged(mc, mouseX, mouseY);
         }
     }
@@ -188,9 +188,9 @@ class DecrementButton extends GuiButton
         {
 			this.zLevel = 150;
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            this.hovered = mouseX >= this.xPosition + guiLeft && mouseY >= this.yPosition + guiTop && mouseX < this.xPosition + guiLeft + this.width && mouseY < this.yPosition + guiTop + this.height;
+            this.hovered = mouseX >= this.x + guiLeft && mouseY >= this.y + guiTop && mouseX < this.x + guiLeft + this.width && mouseY < this.y + guiTop + this.height;
             mc.getTextureManager().bindTexture(texture);
-            this.drawTexturedModalRect(this.xPosition + guiLeft, this.yPosition + guiTop, 0, 5, 5, 5);
+            this.drawTexturedModalRect(this.x + guiLeft, this.y + guiTop, 0, 5, 5, 5);
             this.mouseDragged(mc, mouseX, mouseY);
         }
     }

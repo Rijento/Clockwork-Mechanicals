@@ -54,7 +54,7 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
     }
 	
 	@Override
-	public boolean continueExecuting()
+	public boolean shouldContinueExecuting()
     {
 		if (this.theMechanical.isWinding == true){return false;}
 		if (this.getIsAboveDestination() == true)
@@ -88,7 +88,7 @@ public class EntityAIMechanicalMoveToBlock extends EntityAIBase
            
             if ((this.timeoutCounter < 10))
             {
-            	this.theMechanical.getNavigator().clearPathEntity();
+            	this.theMechanical.getNavigator().clearPath();
             }
             if (this.timeoutCounter > 20)
             {

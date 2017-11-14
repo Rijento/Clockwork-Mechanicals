@@ -9,10 +9,8 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityGolem;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,14 +31,11 @@ import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalPickUp;
 import net.rijento.clockwork_mechanicals.ai.PathNavigateMechanical;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
-import net.rijento.clockwork_mechanicals.lib.ContainerBasic;
 import net.rijento.clockwork_mechanicals.lib.Order;
-import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
 
 public class EntityMechanicalWorker extends EntityGolem 
 {
 	public List<Order> orders;
-	public List<KeepAmnt> filters = new ArrayList<KeepAmnt>();
 	public boolean isWinding = false;
 	private ItemStack Mainspring;
 	private int currentTask;
@@ -94,7 +89,7 @@ public class EntityMechanicalWorker extends EntityGolem
 	
 	protected void updateEquipmentIfNeeded(EntityItem itemEntity)
     {
-        ItemStack itemstack = itemEntity.getEntityItem();
+        ItemStack itemstack = itemEntity.getItem();
         ItemStack itemstack1 = this.workerInventory.addItem(itemstack);
 
         if (itemstack1.isEmpty())
@@ -107,6 +102,11 @@ public class EntityMechanicalWorker extends EntityGolem
         }
     
     }
+	public boolean hasMainspring()
+	{
+		return this.Mainspring != null;
+	}
+	
 	public ItemStack getMainspring()
 	{
 		return this.Mainspring;
@@ -155,10 +155,7 @@ public class EntityMechanicalWorker extends EntityGolem
 				this.tasks.addTask(i, taskPickup);
 				continue;
 			case "craft":
-				InventoryCrafting recipe = new InventoryCrafting(new ContainerBasic(), 3, 3);
-				recipe.setInventorySlotContents(5, new ItemStack(Blocks.PLANKS, 1));
-				recipe.setInventorySlotContents(8, new ItemStack(Blocks.PLANKS, 1));
-				EntityAIMechanicalCraft taskCraft = new EntityAIMechanicalCraft(this, i, recipe);
+				EntityAIMechanicalCraft taskCraft = new EntityAIMechanicalCraft(this, i, order.recipe, order.pos);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskCraft);
 				continue;
@@ -168,7 +165,7 @@ public class EntityMechanicalWorker extends EntityGolem
 				this.tasks.addTask(i, taskChop);
 				continue;
 			case "mine":
-				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, order.facing, true, i);
+				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, order.facing, i);
 				this.tasks.addTask(i, taskMine);
 				continue;
 			}

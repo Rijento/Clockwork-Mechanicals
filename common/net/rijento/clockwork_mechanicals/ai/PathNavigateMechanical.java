@@ -51,7 +51,7 @@ public class PathNavigateMechanical extends PathNavigate {
     @Override
     protected Vec3d getEntityPosition()
     {
-        return new Vec3d(this.theEntity.posX, (double)this.getPathablePosY(), this.theEntity.posZ);
+        return new Vec3d(this.entity.posX, (double)this.getPathablePosY(), this.entity.posZ);
     }
 
     /**
@@ -114,21 +114,21 @@ public class PathNavigateMechanical extends PathNavigate {
     
     private int getPathablePosY()
     {
-        if (this.theEntity.isInWater())
+        if (this.entity.isInWater())
         {
-            int i = (int)this.theEntity.getEntityBoundingBox().minY;
-            Block block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getBlock();
+            int i = (int)this.entity.getEntityBoundingBox().minY;
+            Block block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.entity.posX), i, MathHelper.floor(this.entity.posZ))).getBlock();
             int j = 0;
 
             while (block == Blocks.FLOWING_WATER || block == Blocks.WATER)
             {
                 ++i;
-                block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getBlock();
+                block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.entity.posX), i, MathHelper.floor(this.entity.posZ))).getBlock();
                 ++j;
 
                 if (j > 16)
                 {
-                    return (int)this.theEntity.getEntityBoundingBox().minY;
+                    return (int)this.entity.getEntityBoundingBox().minY;
                 }
             }
 
@@ -136,7 +136,7 @@ public class PathNavigateMechanical extends PathNavigate {
         }
         else
         {
-            return (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D);
+            return (int)(this.entity.getEntityBoundingBox().minY + 0.5D);
         }
     }
    @Override

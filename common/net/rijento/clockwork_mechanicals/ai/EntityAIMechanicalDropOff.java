@@ -15,10 +15,10 @@ import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.filter.Filter;
-import net.rijento.clockwork_mechanicals.lib.filter.KeepAmnt;
 
 public class EntityAIMechanicalDropOff extends EntityAIBase
 {
+	//warning: Bug causes mechanical to vanish if no chest if present at pos
 	private final EntityMechanicalWorker theMechanical;
 	private final int priority;
 	private final BlockPos targetInventory;
@@ -32,7 +32,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		this.theMechanical = theMechanicalIn;
 		this.targetInventory = InventoryIn;
 		this.priority = priorityIn;
-		if (!this.theMechanical.world.isRemote)
+		if (!this.theMechanical.world.isRemote && this.theMechanical.hasMainspring())
 		{
 			this.transferTime = (int)(8 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
 		}
@@ -62,7 +62,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 		}
 	}
 	@Override
-	public boolean continueExecuting()
+	public boolean shouldContinueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
 		//if (this.fullyempty == true){return true;}
@@ -117,7 +117,9 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 	                    }
                     }
                     
-                    ItemStack itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, InventoryOut, new ItemStack(item, 1, itemstack.getMetadata()));
+                    ItemStack itemstack1 = itemstack.copy();
+                    itemstack1.setCount(1);
+                    itemstack1 = putStackInInventoryAllSlots(mechainicalInventory, InventoryOut, itemstack1);
                     if (itemstack1.isEmpty())
                     {
                     	itemstack.shrink(1);
@@ -127,8 +129,8 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
                         break;
                     }
                 }
+    		this.runtime++;
             }
-			this.runtime++;
 		}
     }
 	private ItemStack putStackInInventoryAllSlots(IInventory mechainicalInventory, IInventory InventoryOut, ItemStack itemStack)

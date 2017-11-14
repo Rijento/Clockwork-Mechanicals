@@ -1,14 +1,14 @@
 package net.rijento.clockwork_mechanicals.ai;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
-import net.minecraft.block.BlockBreakable;
-import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.BlockTorch;
-import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockFaceShape;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
@@ -18,30 +18,28 @@ import net.minecraft.world.World;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 
+
+//TODO: make mechanicals use fortune enchant or silk touch enchant as well. Make drops automatically add to inventory (less messy)
+
 public class EntityAIMechanicalMine extends EntityAIBase 
 {
-	private final boolean returnsWhenLow;
 	private final EntityMechanicalWorker theMechanical;
+	private final World world;
 	private final BlockPos start;
 	private final EnumFacing direction;
 	private final int priority;
 	private int runtime;
-	private int breaktime;
-	private int runtest;
+	private float breakprog = 0.0F;
 	
 	
-	public EntityAIMechanicalMine( EntityMechanicalWorker theMechanicalIn, BlockPos posIn, EnumFacing directionIn, boolean returnwhenlow, int priorityIn)
+	public EntityAIMechanicalMine( EntityMechanicalWorker theMechanicalIn, BlockPos posIn, EnumFacing directionIn, int priorityIn)
 	{
 		this.theMechanical = theMechanicalIn;
+		this.world = this.theMechanical.world;
 		this.start = posIn;
 		this.direction = directionIn;
-		this.returnsWhenLow = returnwhenlow;
 		this.priority = priorityIn;
 		this.runtime = 1;
-		if (!this.theMechanical.world.isRemote)
-		{
-			this.runtest = (int)(50 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
-		}
 	}
 	
 	public boolean shouldUpdate()
@@ -51,12 +49,9 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
 		else if (this.theMechanical.isEntityInsideOpaqueBlock()){return false;}
+		else if (!this.hasPickaxe()){return false;}
 		else if (this.checkFull()){this.theMechanical.nextTask(); return false;}
-		else if (this.returnsWhenLow)
-		{
-			if (this.shouldReturn()){return false;}
-			else{return true;}
-		}
+		else if (this.shouldReturn()){return false;}
 		else{return true;}
 	}
 	
@@ -69,27 +64,19 @@ public class EntityAIMechanicalMine extends EntityAIBase
 		else if (this.theMechanical.isWet()){return false;}
 		else if (this.theMechanical.isEntityInsideOpaqueBlock()){return false;}
 		else if (this.checkFull()){this.theMechanical.nextTask(); return false;}
-		else if (this.returnsWhenLow)
+		else if (this.shouldReturn()) //return if reached block limit
 		{
-			if (this.shouldReturn())
-			{
-				this.theMechanical.nextTask();
-				return false;
-			}
-			else
-			{
-				if (this.runtime > this.runtest){this.runtime = 1;}
-				return true;
-			}
+			this.theMechanical.nextTask();
+			return false;
 		}
 		else
 		{
-			if (this.runtime > this.runtest){this.runtime = 1;}
+			if(this.runtime >= 100){this.runtime = 1;}
 			return true;
 		}
 	}
 	@Override
-	public boolean continueExecuting()
+	public boolean shouldContinueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
 		else {return true;}
@@ -114,26 +101,40 @@ public class EntityAIMechanicalMine extends EntityAIBase
      */
 	private boolean tunnel()
 	{
-		World world = this.theMechanical.getEntityWorld();
 		BlockPos pos = this.theMechanical.getPosition();
 		BlockPos topBreak = pos.offset(this.direction).up();
 		BlockPos botBreak = pos.offset(this.direction);
-		Boolean toptest = world.getBlockState(topBreak).getBlock().isBlockSolid(world, topBreak, this.direction.getOpposite()) && !(world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK) && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
-		Boolean bottest = world.getBlockState(botBreak).getBlock().isBlockSolid(world, botBreak, this.direction.getOpposite()) && !(world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK) && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
+		Boolean toptest = this.world.getBlockState(topBreak).getBlockFaceShape(this.world, topBreak, this.direction.getOpposite()) == BlockFaceShape.SOLID && !(this.world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK);// && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
+		Boolean bottest = this.world.getBlockState(botBreak).getBlockFaceShape(this.world, botBreak, this.direction.getOpposite()) == BlockFaceShape.SOLID && !(this.world.getBlockState(topBreak).getBlock() == Blocks.BEDROCK);// && !(world.getBlockState(topBreak).getBlock() == Blocks.OBSIDIAN);
 		if (toptest)
 		{
-			if (this.runtime % this.runtest == 0){
-				world.destroyBlock(topBreak, true);
+			float speed = this.getDigSpeed(this.world.getBlockState(topBreak)) * (this.theMechanical.hasMainspring() ? ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()) : 0);
+			float hardness = this.world.getBlockState(topBreak).getBlockHardness(this.world, topBreak);
+			float perTick = speed/hardness/30F;
+			this.breakprog += perTick;
+			this.world.sendBlockBreakProgress(this.theMechanical.getEntityId(), topBreak, (int)(this.breakprog * 10F) - 1);
+			if (this.breakprog >= 1.0F)
+			{
+				this.world.destroyBlock(topBreak, true);
+				this.damagePickaxe();
 				this.theMechanical.unwind(0.5f);
+				this.breakprog = 0;
 			}
 			return false;
 		}
-		else if (bottest && !(world.getBlockState(botBreak).getBlock() instanceof BlockTorch))
+		else if (bottest && !(this.world.getBlockState(botBreak).getBlock() instanceof BlockTorch))
 		{
-			if (this.runtime % this.runtest == 0)
+			float speed = this.getDigSpeed(this.world.getBlockState(botBreak)) * ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage());
+			float hardness = this.world.getBlockState(botBreak).getBlockHardness(this.world, botBreak);
+			float perTick = speed/hardness/30F;
+			this.breakprog += perTick;
+			this.world.sendBlockBreakProgress(this.theMechanical.getEntityId(), botBreak, (int)(this.breakprog * 10F) - 1);
+			if (this.breakprog >= 1.0F)
 			{
-				world.destroyBlock(botBreak, true);
+				this.world.destroyBlock(botBreak, true);
 				this.theMechanical.unwind(0.5f);
+				this.damagePickaxe();
+				this.breakprog = 0;
 				return true;
 			}
 			return false;
@@ -186,6 +187,22 @@ public class EntityAIMechanicalMine extends EntityAIBase
         }
 		return false;
 	}
+	
+	private ItemStack getPickaxe()
+	{
+		for (int i = 0; i < this.theMechanical.getMechanicalInventory().getSizeInventory(); ++i)
+		{
+			ItemStack itemstack = this.theMechanical.getMechanicalInventory().getStackInSlot(i);
+			Item item = itemstack.getItem();
+
+            if (!itemstack.isEmpty() && (item instanceof ItemPickaxe))
+            {
+            	return itemstack;
+            }
+        }
+		return null;
+	}
+	
 	private void damagePickaxe()
 	{
 		for (int i = 0; i < this.theMechanical.getMechanicalInventory().getSizeInventory(); ++i)
@@ -195,7 +212,7 @@ public class EntityAIMechanicalMine extends EntityAIBase
 	
 	        if (!itemstack.isEmpty() && (item instanceof ItemPickaxe))
 	        {
-	        	item.setDamage(itemstack, item.getDamage(itemstack)+1);
+	        	itemstack.attemptDamageItem(1, this.theMechanical.world.rand, null);
 	        	return;
 	        }
 	    }
@@ -225,11 +242,26 @@ public class EntityAIMechanicalMine extends EntityAIBase
 	}
 	private boolean shouldReturn()
 	{
-		World world = this.theMechanical.getEntityWorld();
 		BlockPos pos = this.theMechanical.getPosition();
 		double blocks = Math.floor(Math.sqrt(this.theMechanical.getDistanceSq(this.start)));
 		if (((blocks + 10) * 0.25D) >= this.theMechanical.getTension()){return true;}
 		else if(blocks >= 100){return true;}
 		else{return false;}
+	}
+	
+	private float getDigSpeed(IBlockState blockIn)
+	{
+		float f = this.getPickaxe().getDestroySpeed(blockIn);
+		if (f > 1.0F)
+        {
+			ItemStack itemstack = this.getPickaxe();
+            int i = EnchantmentHelper.getEnchantmentLevel(Enchantments.EFFICIENCY, itemstack);
+
+            if (i > 0 && !itemstack.isEmpty())
+            {
+                f += (float)(i * i + 1);
+            }
+        }
+		return (f < 0 ? 0 : f);
 	}
 }

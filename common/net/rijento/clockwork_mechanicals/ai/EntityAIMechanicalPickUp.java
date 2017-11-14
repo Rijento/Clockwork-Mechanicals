@@ -30,7 +30,7 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 		this.theMechanical = theMechanicalIn;
 		this.targetInventory = InventoryIn;
 		this.priority = priorityIn;
-		if (!this.theMechanical.world.isRemote)
+		if (!this.theMechanical.world.isRemote && this.theMechanical.hasMainspring())
 		{
 			this.transferTime = (int)(8 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
 		}
@@ -59,7 +59,7 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 		}
 	}
 	@Override
-	public boolean continueExecuting()
+	public boolean shouldContinueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
 		else if (this.runtime >= this.maxruntime)
@@ -113,8 +113,9 @@ public class EntityAIMechanicalPickUp extends EntityAIBase {
 	                    	continue;
 	                    }
                     }
-                    
-                    ItemStack itemstack1 = putStackInInventoryAllSlots(InventoryIn, mechainicalInventory, new ItemStack(item, 1, itemstack.getMetadata()));
+                    ItemStack itemstack1 = itemstack.copy();
+                    itemstack1.setCount(1);
+                    itemstack1 = putStackInInventoryAllSlots(InventoryIn, mechainicalInventory, itemstack1);
                     if (itemstack1.isEmpty())
                     {
                     	itemstack.shrink(1);

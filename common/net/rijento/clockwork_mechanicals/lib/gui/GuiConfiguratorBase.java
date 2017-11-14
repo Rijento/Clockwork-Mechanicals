@@ -69,13 +69,13 @@ public class GuiConfiguratorBase extends GuiContainer
         if (selected == 5)
         {
         	if (buttonBlackWhite1 == null){buttonList.add(buttonBlackWhite1 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
-        	else{buttonList.add(buttonBlackWhite1); buttonBlackWhite1.xPosition=guiLeft + 88; buttonBlackWhite1.yPosition=((this.height - 222) / 2) + 43;}
+        	else{buttonList.add(buttonBlackWhite1); buttonBlackWhite1.x=guiLeft + 88; buttonBlackWhite1.y=((this.height - 222) / 2) + 43;}
         	buttonBlackWhite1.BoW = ((ItemMechanicalConfigurator)configuratorStack.getItem()).withdrawFilter.Whitelist;
         }
         if (selected == 6)
         {
         	if (buttonBlackWhite2 == null){buttonList.add(buttonBlackWhite2 = new ButtonBW(9, guiLeft + 88, ((this.height - 222) / 2) + 43));}
-        	else{buttonList.add(buttonBlackWhite2);buttonBlackWhite2.xPosition=guiLeft + 88; buttonBlackWhite2.yPosition=((this.height - 222) / 2) + 43;}
+        	else{buttonList.add(buttonBlackWhite2);buttonBlackWhite2.x=guiLeft + 88; buttonBlackWhite2.y=((this.height - 222) / 2) + 43;}
         	buttonBlackWhite2.BoW = ((ItemMechanicalConfigurator)configuratorStack.getItem()).depositFilter.Whitelist;
         }
         
@@ -105,7 +105,7 @@ public class GuiConfiguratorBase extends GuiContainer
 			{
 	        	slot.draw(this.mc, itemRender, guiLeft, guiTop, mouseX, mouseY);
 			}
-			fontRendererObj.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
+			fontRenderer.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
 			return;
 		}
 		else if (selected == 6)
@@ -120,7 +120,7 @@ public class GuiConfiguratorBase extends GuiContainer
 			{
 	        	slot.draw(this.mc, itemRender, guiLeft, guiTop, mouseX, mouseY);
 			}
-			fontRendererObj.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
+			fontRenderer.drawString("Filter", guiLeft + 31, guiTop + 32, 1);
 			return;
 		}
 		else if (selected == 7)
@@ -345,14 +345,14 @@ public class GuiConfiguratorBase extends GuiContainer
 			super(buttonId, x, y, 18, 18, displayIn);
 		}
 		@Override
-        public void drawButton(Minecraft mc, int mouseX, int mouseY)
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks)
         {
-			FontRenderer fontrenderer = mc.fontRendererObj;
-            this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition && mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+			FontRenderer fontrenderer = mc.fontRenderer;
+            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
             int j = 14737632;
             if (this.hovered)
             {
-            	this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition - (this.height - 8) / 2, j);
+            	this.drawCenteredString(fontrenderer, this.displayString, this.x + this.width / 2, this.y - (this.height - 8) / 2, j);
             }
 
             
@@ -361,13 +361,13 @@ public class GuiConfiguratorBase extends GuiContainer
 	@SideOnly (Side.CLIENT)
 	static class ButtonBW extends GuiButton
 	{
-		public boolean BoW = true;
+		public boolean BoW = false;
 		public ButtonBW(int buttonId, int x, int y) {
 			super(buttonId, x, y, 18, 18, "");
 			// TODO Auto-generated constructor stub
 		}
 		@Override
-        public void drawButton(Minecraft mc, int parX, int parY)
+        public void drawButton(Minecraft mc, int parX, int parY, float partialTicks)
         {
 			if (visible)
             {
@@ -375,8 +375,8 @@ public class GuiConfiguratorBase extends GuiContainer
                 mc.getTextureManager().bindTexture(withdrawTexture);
                 int textureX = 176;
                 int textureY = 0;
-                if (! BoW){textureX += 18;}
-                drawTexturedModalRect(xPosition, yPosition, textureX, textureY, 18, 18);
+                if (!BoW){textureX += 18;}
+                drawTexturedModalRect(x, y, textureX, textureY, 18, 18);
             }
         }
 	}

@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.Constants;
 
 public class Filter {
 	public final InventoryBasic filterInventory;
-	public boolean Whitelist = true;
+	public boolean Whitelist = false;
 
 	public final NonNullList<Boolean> advancedSlots;
 	
@@ -54,8 +54,8 @@ public class Filter {
 				return false;
 			}
 			for (int i = 0; i < 9 && i < this.filterInventory.getSizeInventory(); i++) {
-				if (ItemStack.areItemsEqualIgnoreDurability(TestStack, this.filterInventory.getStackInSlot(i))
-						&& ItemStack.areItemStackTagsEqual(TestStack, this.filterInventory.getStackInSlot(i))) {
+				if (ItemStack.areItemsEqualIgnoreDurability(TestStack, this.filterInventory.getStackInSlot(i))){
+//						&& ItemStack.areItemStackTagsEqual(TestStack, this.filterInventory.getStackInSlot(i))) {
 					if (advancedSlots.get(i)) {
 						int amountAllowed = filterInventory.getStackInSlot(i).getCount();
 						if (getInventoryCount(TestStack, TestInventory1) < amountAllowed) {
@@ -73,8 +73,8 @@ public class Filter {
 				return true;
 			}
 			for (int i = 0; i < 9 && i < this.filterInventory.getSizeInventory(); i++) {
-				if (ItemStack.areItemsEqualIgnoreDurability(TestStack, this.filterInventory.getStackInSlot(i))
-						&& ItemStack.areItemStackTagsEqual(TestStack, this.filterInventory.getStackInSlot(i))) {
+				if (ItemStack.areItemsEqualIgnoreDurability(TestStack, this.filterInventory.getStackInSlot(i))){
+//						&& ItemStack.areItemStackTagsEqual(TestStack, this.filterInventory.getStackInSlot(i))) {
 					if (advancedSlots.get(i)) {
 						int amountAllowed = filterInventory.getStackInSlot(i).getCount();
 						if (getInventoryCount(TestStack, TestInventory2) > amountAllowed) {

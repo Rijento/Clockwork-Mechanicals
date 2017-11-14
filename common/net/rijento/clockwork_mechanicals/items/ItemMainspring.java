@@ -2,6 +2,7 @@ package net.rijento.clockwork_mechanicals.items;
 
 import java.util.List;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
@@ -30,11 +32,14 @@ public class ItemMainspring extends Item
 		this.setHasSubtypes(true);
 		this.setMaxStackSize(1);
 		this.setMaxDamage(0);
-		this.setCreativeTab(ModItems.modTab);
+		this.setCreativeTab(ClockworkMechanicals.creativeTab);
+//		this.setRegistryName(ClockworkMechanicals.MOD_ID, "ItemMainspring");
+//		this.setUnlocalizedName(ClockworkMechanicals.RESOURCE_PREFIX + "ItemMainspring");
+		
 	}
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
     {
 		ItemMainspringType type = ITEM_VARIANTS[stack.getItemDamage()];
 		float resistance = type.getResistance();
@@ -50,11 +55,11 @@ public class ItemMainspring extends Item
 	
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubItems(Item itemIn, CreativeTabs tab, NonNullList<ItemStack> subItems)
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
 	{
 		for (ItemMainspringType type : ITEM_VARIANTS)
 		{
-			subItems.add(new ItemStack(itemIn, 1, type.ordinal()));
+			subItems.add(new ItemStack(this, 1, type.ordinal()));
 		}
 	}
 	

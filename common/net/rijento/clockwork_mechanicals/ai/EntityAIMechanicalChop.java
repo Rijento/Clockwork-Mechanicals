@@ -27,7 +27,7 @@ public class EntityAIMechanicalChop extends EntityAIBase
 		this.priority = priorityIn;
 		this.currentTask = -1;
 		this.ticks = -1;
-		if (!this.theMechanical.world.isRemote)
+		if (!this.theMechanical.world.isRemote && this.theMechanical.hasMainspring())
 		{
 			this.workTime = (int)(30 / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
 		}
@@ -66,7 +66,7 @@ public class EntityAIMechanicalChop extends EntityAIBase
 	}
 	
 	@Override
-	public boolean continueExecuting()
+	public boolean shouldContinueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
 		else {return true;}

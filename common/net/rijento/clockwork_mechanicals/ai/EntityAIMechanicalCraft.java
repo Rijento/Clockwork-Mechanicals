@@ -1,17 +1,18 @@
 package net.rijento.clockwork_mechanicals.ai;
 
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.util.math.BlockPos;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
+import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 
 public class EntityAIMechanicalCraft extends EntityAIBase {
 
 	private final EntityMechanicalWorker theMechanical;
+	private final BlockPos pos;
 	private final int priority;
 	private final InventoryCrafting craftMatrix;
 	private final ItemStack result;
@@ -19,24 +20,28 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 	private final static int maxruntime = 100;
 	private int runtime;
 	
-	public EntityAIMechanicalCraft(EntityMechanicalWorker mechanicalIn, int priorityIn, InventoryCrafting matrixIn) 
+	public EntityAIMechanicalCraft(EntityMechanicalWorker mechanicalIn, int priorityIn, InventoryCrafting matrixIn, BlockPos posin)
 	{
 		this.theMechanical = mechanicalIn;
 		this.priority = priorityIn;
 		this.craftMatrix = matrixIn;
-		this.result = CraftingManager.getInstance().findMatchingRecipe(craftMatrix, this.theMechanical.getEntityWorld());
+		this.pos = posin;
+		this.result = CraftingManager.findMatchingResult(craftMatrix, this.theMechanical.getEntityWorld());
 		this.runtime = 0;
-		this.runDelay = 20;
+		if (!this.theMechanical.world.isRemote && this.theMechanical.hasMainspring())
+		{
+			this.runDelay = (int) (10F / ItemMainspring.getResistance(this.theMechanical.getMainspring().getItemDamage()));
+		}
 	}
 	
 	public boolean shouldUpdate()
 	{
 		if (this.priority != this.theMechanical.getCurrentTask()){return false;}
+		else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.pos)) > 1.75D){return false;}
 		else if (!(this.theMechanical.getTension()-0.25F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
 		else if (this.runtime > this.maxruntime){return false;}
-		else if (this.runDelay > 0){return false;}
         else{return true;}
 	}
 	
@@ -46,7 +51,6 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 		else if (!(this.theMechanical.getTension()-0.25F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
-		else if (this.runtime > this.maxruntime){this.theMechanical.nextTask(); this.runtime = 0; return false;}
 		else if (this.runDelay > 0)
 		{
 			--this.runDelay;
@@ -60,9 +64,10 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 	}
 	
 	@Override
-	public boolean continueExecuting()
+	public boolean shouldContinueExecuting()
 	{
 		if (this.theMechanical.isWinding == true){return false;}
+		else if (this.runtime > this.maxruntime){this.theMechanical.nextTask(); this.runtime = 0; return false;}
 		else {return true;}
 	}
 	
@@ -75,6 +80,7 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 	
 	public boolean attemptCraft()
 	{
+		// TODO: check has ingredients
 		if (this.theMechanical.getMechanicalInventory().isEmpty()){return false;}
 		InventoryBasic ingredients = copy(this.theMechanical.getMechanicalInventory());
 		
@@ -88,7 +94,7 @@ public class EntityAIMechanicalCraft extends EntityAIBase {
 				ItemStack test2 = ingredients.getStackInSlot(j);
 				if (test2.isEmpty()){continue;}
 				
-				if (ItemStack.areItemStackTagsEqual(test1, test2))
+				if ((test1.getItem() != test2.getItem() ? false : (test1.getMetadata() != test2.getMetadata() ? false : ItemStack.areItemStackTagsEqual(test1, test2))))
 				{
 					ingredients.decrStackSize(j, 1);
 					flag = true;

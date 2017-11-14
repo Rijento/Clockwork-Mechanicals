@@ -44,6 +44,7 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
     	else{return false;}
     }
     
+    @Override
     public boolean shouldExecute()
     {
     	if (this.priority != this.theMechanical.getCurrentTask()){return false;}
@@ -63,16 +64,18 @@ public class EntityAIMechanicalHarvestFarmland extends EntityAIBase
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
-    public boolean continueExecuting()
+    @Override
+    public boolean shouldContinueExecuting()
     {
     	if (this.theMechanical.isWinding == true){return false;}
-    	super.continueExecuting();
+    	super.shouldContinueExecuting();
     	return false;
     }
 
     /**
      * Updates the task
      */
+    @Override
     public void updateTask()
     {
     	if (!this.shouldUpdate()){return;}

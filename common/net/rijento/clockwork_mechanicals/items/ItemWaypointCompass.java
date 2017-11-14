@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItemFrame;
@@ -12,7 +13,6 @@ import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -94,7 +94,7 @@ public class ItemWaypointCompass extends Item
             @SideOnly(Side.CLIENT)
             private double getFrameRotation(EntityItemFrame p_185094_1_)
             {
-                return (double)MathHelper.clampAngle(180 + p_185094_1_.facingDirection.getHorizontalIndex() * 90);
+                return (double)MathHelper.wrapDegrees(180 + p_185094_1_.facingDirection.getHorizontalIndex() * 90);
             }
             @SideOnly(Side.CLIENT)
             private double getAngleToBlock(BlockPos pos, Entity player)
@@ -105,20 +105,18 @@ public class ItemWaypointCompass extends Item
     }
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
     {
 		tooltip.add(TextFormatting.WHITE + "Shift + right-click to set point.");
 		if (hasTarget(stack))
 		{
 			BlockPos pos = getTargetPos(stack);
-			tooltip.add(TextFormatting.WHITE + "Current Target: " + pos.toString());
+			tooltip.add(TextFormatting.WHITE + "Target: " + pos.toString());
 		}
 		else
 		{
-			tooltip.add(TextFormatting.WHITE + "Current Target: None");
-		}
-		tooltip.add(TextFormatting.RED + "Known bug: texture for waypoint compass points to either current active waypoint compass or first waypoint compass in inventory. When using more than one, hold desired compass to update its texture.");
-		
+			tooltip.add(TextFormatting.WHITE + "Target: None");
+		}		
     }
 	
 	

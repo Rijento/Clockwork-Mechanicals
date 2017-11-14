@@ -22,6 +22,9 @@ public class ClockworkMechanicals {
 	public static final String VERSION = "@VERSION@";
 	public static final String DEPENDENCIES = "required-after:forge@[13.20.0.2228,)";
 	public static final String RESOURCE_PREFIX = MOD_ID+":";
+	
+	public static final CreativeTabCM creativeTab = new CreativeTabCM();
+	
 	private final DataFixer dataFixer = ClockworkDataFixesManager.createFixer();
 	//variables
 	public static Random random = new Random();

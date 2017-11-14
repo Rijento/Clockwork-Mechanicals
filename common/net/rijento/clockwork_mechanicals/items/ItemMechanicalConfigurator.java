@@ -8,6 +8,7 @@ import org.lwjgl.input.Keyboard;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockSapling;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
@@ -44,7 +45,7 @@ public class ItemMechanicalConfigurator extends Item
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
     {
 		tooltip.add(TextFormatting.WHITE + "Number of orders: " + String.valueOf(this.getNumOrders(stack)));
 		tooltip.add(TextFormatting.WHITE + "Right-click in offhnad to open GUI.");
@@ -138,7 +139,7 @@ public class ItemMechanicalConfigurator extends Item
 					return EnumActionResult.SUCCESS;
 				}
 				Order mine = new Order(pos,"mine");
-				mine.setFacing(facing.getOpposite());
+				mine.setFacing(player.getHorizontalFacing());
 				addOrder(mine, stack);
 				
 		        return EnumActionResult.SUCCESS;
@@ -165,6 +166,18 @@ public class ItemMechanicalConfigurator extends Item
 				Order dropoff = new Order(pos, "dropoff");
 				dropoff.filter = this.depositFilter;
 				this.addOrder(dropoff, stack);
+		        return EnumActionResult.SUCCESS;
+			}
+			else if (this.current_task == 7)
+			{
+				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+				{
+					removeOrder(pos, "craft", stack);
+					return EnumActionResult.SUCCESS;
+				}
+				Order craft = new Order(pos, "craft");
+				craft.recipe = this.recipe;
+				this.addOrder(craft, stack);
 		        return EnumActionResult.SUCCESS;
 			}
 		}

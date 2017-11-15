@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+        "item": "clockwork_mechanicals:blank_mold"
+    }
+  ],
+  "result": {
+    "item": "minecraft:clay_ball"
+  }
+}

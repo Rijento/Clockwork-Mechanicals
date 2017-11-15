@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -31,11 +32,7 @@ public class ItemMainspring extends Item
 	{
 		this.setHasSubtypes(true);
 		this.setMaxStackSize(1);
-		this.setMaxDamage(0);
-		this.setCreativeTab(ClockworkMechanicals.creativeTab);
-//		this.setRegistryName(ClockworkMechanicals.MOD_ID, "ItemMainspring");
-//		this.setUnlocalizedName(ClockworkMechanicals.RESOURCE_PREFIX + "ItemMainspring");
-		
+		this.setMaxDamage(0);	
 	}
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -57,9 +54,12 @@ public class ItemMainspring extends Item
 	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> subItems)
 	{
-		for (ItemMainspringType type : ITEM_VARIANTS)
-		{
-			subItems.add(new ItemStack(this, 1, type.ordinal()));
+		if (this.isInCreativeTab(tab))
+        {
+			for (ItemMainspringType type : ITEM_VARIANTS)
+			{
+				subItems.add(new ItemStack(this, 1, type.ordinal()));
+			}
 		}
 	}
 	
@@ -100,10 +100,6 @@ public class ItemMainspring extends Item
 	@Override
 	public String getUnlocalizedName(ItemStack stack)
 	{
-		return "item." + ClockworkMechanicals.RESOURCE_PREFIX + "ItemMainspring" + ItemMainspringType.fromOrdinal(stack.getMetadata()).getID();
+		return "item." + ClockworkMechanicals.RESOURCE_PREFIX + "mainspring_" + ItemMainspringType.fromOrdinal(stack.getMetadata()).getID();
 	}
-	
-	
-	
-
 }

@@ -45,43 +45,33 @@ public class ModItems
 	
 	public static void setupItems()
 	{
-		setupItem("ItemMainspring", mainspring);
-		setupItem("ItemWindingKey", winding_key).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ItemMechanicalConfigurator", mechanical_configurator).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ItemWaypointCompass", waypoint_compass).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ingotBrass", brass_ingot).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ingotZinc", zinc_ingot).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ingotCopper", copper_ingot).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ItemMoldTemplate", mold_template).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ItemBlankMold", blank_mold).setCreativeTab(ClockworkMechanicals.creativeTab);
+		setupItem("mainspring", mainspring);
+		setupItem("winding_key", winding_key);
+		setupItem("mechanical_configurator", mechanical_configurator);
+		setupItem("waypoint_compass", waypoint_compass);
+		setupItem("brass_ingot", brass_ingot);
+		setupItem("zinc_ingot", zinc_ingot);
+		setupItem("copper_ingot", copper_ingot);
+		setupItem("mold_template", mold_template);
+		setupItem("blank_mold", blank_mold);
 		
-		setupItem("ItemGearSmall", small_gear).setCreativeTab(ClockworkMechanicals.creativeTab);
-		setupItem("ItemPlateSmall", small_plate).setCreativeTab(ClockworkMechanicals.creativeTab);
+		setupItem("gear_small", small_gear);
+		setupItem("plate_small", small_plate);
 		
 		//setupItemBlock(stamping_table);
 //		
-	}
-	
-	public static void regModels()
-	{
-		
-		
 	}
 	private static <I extends Item> I setupItem(String name, I item)
 	{
 		item.setUnlocalizedName(ClockworkMechanicals.RESOURCE_PREFIX + name);
 		item.setRegistryName(ClockworkMechanicals.MOD_ID, name);
+		item.setCreativeTab(ClockworkMechanicals.creativeTab);
 		return item;
 	}
 	private static Item setupItemBlock(ItemBlock block)
 	{
 		block.setUnlocalizedName(block.getBlock().getUnlocalizedName());
 		block.setRegistryName(block.getBlock().getRegistryName());
-		
-//		ForgeRegistries.ITEMS.register(iblock);
-//		
-//		registeredItems.add(iblock);
-		
 		return block;
 	}
 	

@@ -13,5 +13,6 @@ public class ModOreDict
 		OreDictionary.registerOre("ingotCopper", ModItems.copper_ingot);
 		OreDictionary.registerOre("hardenedclay", Blocks.HARDENED_CLAY);
 		OreDictionary.registerOre("hardenedclay", new ItemStack(Blocks.STAINED_HARDENED_CLAY, 1, OreDictionary.WILDCARD_VALUE));
+		OreDictionary.registerOre("mold_template_wildcard", new ItemStack(ModItems.mold_template, 1, OreDictionary.WILDCARD_VALUE));
 	}
 }

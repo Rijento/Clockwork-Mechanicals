@@ -63,7 +63,10 @@ public class EntityAIMechanicalAttack extends EntityAIBase
 	public void updateTask()
 	{
 		if (!shouldUpdate()) {return;}
-		
+		for (EntityLiving target : getTargets())
+		{
+//			target.attackEntityFrom(source, amount)
+		}
 	}
 	
 	public List<EntityLiving> getTargets()

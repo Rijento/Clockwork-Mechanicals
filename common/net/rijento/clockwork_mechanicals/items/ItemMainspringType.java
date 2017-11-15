@@ -2,11 +2,11 @@ package net.rijento.clockwork_mechanicals.items;
 
 public enum ItemMainspringType
 {
-	BRASS(1.0f,1.0f,1.0f,100.0f,"Brass"),
-	IRON(1.25f,0.9f,1.0f,100.0f,"Iron"),
-	COPPER(0.9f,1.25f,1.0f,100.0f,"Copper"),
-	ZINC(1.15f,0.95f,1.0f,100.0f,"Zinc"),
-	GOLD(0.8f,1.30f,1.0f,100.0f,"Gold");
+	BRASS(1.0f,1.0f,1.0f,100.0f,"brass"),
+	IRON(1.25f,0.9f,1.0f,100.0f,"iron"),
+	COPPER(0.9f,1.25f,1.0f,100.0f,"copper"),
+	ZINC(1.15f,0.95f,1.0f,100.0f,"zinc"),
+	GOLD(0.8f,1.30f,1.0f,100.0f,"gold");
 	
 	private final float resistance;
 	private final float flexability;

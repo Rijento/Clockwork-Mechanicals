@@ -3,16 +3,16 @@ package net.rijento.clockwork_mechanicals.ai;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.java.games.input.Component.Identifier.Axis;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.rijento.clockwork_mechanicals.entities.EntityMechanicalWorker;
 
-// Attacks any entity within a 3x3 area centered around target
+// Attacks any entity within a 3x3 area centered around target, attacks area 3 times then moves to next task.
 public class EntityAIMechanicalAttack extends EntityAIBase
 {
 	private final EntityMechanicalWorker theMechanical;
@@ -20,14 +20,13 @@ public class EntityAIMechanicalAttack extends EntityAIBase
 	private final AxisAlignedBB AOE;
 	private final int priority;
 	private final World world;
+	private int runtime = 0;
 	
 	public EntityAIMechanicalAttack(EntityMechanicalWorker mechanicalIn, BlockPos posIn, int priorityIn)
 	{
 		this.theMechanical = mechanicalIn;
 		this.target = posIn.up();
-		this.AOE = new AxisAlignedBB(target);
-		this.AOE.expand(1, 0, 1);
-		this.AOE.setMaxY(this.target.getY()+2);
+		this.AOE = new AxisAlignedBB(target).grow(1, 1, 1).offset(0, 1, 0);
 		this.priority = priorityIn;
 		this.world = mechanicalIn.world;
 	}
@@ -38,7 +37,7 @@ public class EntityAIMechanicalAttack extends EntityAIBase
 		else if (!(this.theMechanical.getTension()-0.75F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
-		else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.target)) >= 1.0D){return false;}
+		else if (Math.sqrt(this.theMechanical.getDistanceSqToCenter(this.target)) >= 0.7D){return false;}
 		else{return true;}
 	}
 	
@@ -49,6 +48,12 @@ public class EntityAIMechanicalAttack extends EntityAIBase
 		else if (!(this.theMechanical.getTension()-0.75F>0)){return false;}
 		else if (this.theMechanical.isWinding == true){return false;}
 		else if (this.theMechanical.isWet()){return false;}
+		else if (this.runtime >= 45)
+		{
+			this.runtime = 0;
+			this.theMechanical.nextTask();
+			return false;
+		}
 		else {return true;}
 	}
 
@@ -63,10 +68,13 @@ public class EntityAIMechanicalAttack extends EntityAIBase
 	public void updateTask()
 	{
 		if (!shouldUpdate()) {return;}
+		++runtime;
+		if (this.runtime % 15 != 0){return;}
 		for (EntityLiving target : getTargets())
 		{
-//			target.attackEntityFrom(source, amount)
+			target.attackEntityFrom(DamageSource.causeMobDamage(this.theMechanical), 1);
 		}
+		this.theMechanical.unwind(0.25F);
 	}
 	
 	public List<EntityLiving> getTargets()
@@ -77,7 +85,6 @@ public class EntityAIMechanicalAttack extends EntityAIBase
 		{
 			if (entity instanceof EntityLiving)
 			{
-				System.out.println(entity.getName()); //TODO Remove after testing
 				targets.add((EntityLiving) entity);
 			}
 		}

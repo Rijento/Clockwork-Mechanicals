@@ -131,6 +131,17 @@ public class ItemMechanicalConfigurator extends Item
 				addOrder(pos,"chop",stack);
 		        return EnumActionResult.SUCCESS;
 			}
+			else if (this.current_task == 3)
+			{
+				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+				{
+					removeOrder(pos, "attack", stack);
+					return EnumActionResult.SUCCESS;
+				}
+				Order attack = new Order(pos, "attack");
+				this.addOrder(attack, stack);
+		        return EnumActionResult.SUCCESS;
+			}
 			else if (this.current_task == 4)
 			{
 				if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))

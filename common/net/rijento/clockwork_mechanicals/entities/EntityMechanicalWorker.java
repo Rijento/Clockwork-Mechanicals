@@ -22,6 +22,7 @@ import net.minecraft.util.datafix.walkers.ItemStackDataLists;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalAttack;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalChop;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalCraft;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalDropOff;
@@ -144,6 +145,19 @@ public class EntityMechanicalWorker extends EntityGolem
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskHarvest);
 				continue;
+			case "chop":
+				EntityAIMechanicalChop taskChop = new EntityAIMechanicalChop(this, order.pos, i);
+				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
+				this.tasks.addTask(i, taskChop);
+				continue;
+			case "attack":
+				EntityAIMechanicalAttack taskAttack = new EntityAIMechanicalAttack(this, order.pos, i);
+				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
+				this.tasks.addTask(i, taskAttack);
+			case "mine":
+				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, order.facing, i);
+				this.tasks.addTask(i, taskMine);
+				continue;
 			case "dropoff":
 				EntityAIMechanicalDropOff taskDropoff = new EntityAIMechanicalDropOff(this, order.pos, i, order.filter);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
@@ -158,15 +172,6 @@ public class EntityMechanicalWorker extends EntityGolem
 				EntityAIMechanicalCraft taskCraft = new EntityAIMechanicalCraft(this, i, order.recipe, order.pos);
 				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
 				this.tasks.addTask(i, taskCraft);
-				continue;
-			case "chop":
-				EntityAIMechanicalChop taskChop = new EntityAIMechanicalChop(this, order.pos, i);
-				this.tasks.addTask(i, new EntityAIMechanicalMoveToBlock(this, this.getAIMoveSpeed(), order.pos, i));
-				this.tasks.addTask(i, taskChop);
-				continue;
-			case "mine":
-				EntityAIMechanicalMine taskMine = new EntityAIMechanicalMine(this, order.pos, order.facing, i);
-				this.tasks.addTask(i, taskMine);
 				continue;
 			}
 		}
@@ -304,7 +309,7 @@ public class EntityMechanicalWorker extends EntityGolem
 	@Override
 	public boolean isEntityInvulnerable(DamageSource source)
     {
-        return source == DamageSource.IN_WALL || source == DamageSource.ON_FIRE || source == DamageSource.CACTUS;
+        return source == DamageSource.IN_WALL || source == DamageSource.ON_FIRE || source == DamageSource.CACTUS ||  source.isMagicDamage();
     }
 	
 	public void onDeath(DamageSource cause)

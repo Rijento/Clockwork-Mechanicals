@@ -79,7 +79,7 @@ public class EntityMechanicalWorker extends EntityGolem
 				&& this.tension > 1.0F 
 				&& !this.isWinding
 				&& !this.isWet()) 
-			{this.playSound(ModSoundEvents.WORKER_TICK, this.getSoundVolume() / 2.0F,1.0F);}
+			{this.playSound(ModSoundEvents.WORKER_TICK, this.getSoundVolume() / 3F,1.0F);}
 		if (this.prevTension < this.tension){this.isWinding = true;}
 		else{this.isWinding = false;}
 		double d0 = this.posX - this.prevPosX;

@@ -31,6 +31,7 @@ import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMine;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalMoveToBlock;
 import net.rijento.clockwork_mechanicals.ai.EntityAIMechanicalPickUp;
 import net.rijento.clockwork_mechanicals.ai.PathNavigateMechanical;
+import net.rijento.clockwork_mechanicals.init.ModSoundEvents;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
@@ -73,6 +74,12 @@ public class EntityMechanicalWorker extends EntityGolem
 	@Override
 	public void onUpdate()
 	{
+		if (this.ticksExisted % 20 == 0 
+				&& this.hasMainspring() 
+				&& this.tension > 1.0F 
+				&& !this.isWinding
+				&& !this.isWet()) 
+			{this.playSound(ModSoundEvents.WORKER_TICK, this.getSoundVolume() / 2.0F,1.0F);}
 		if (this.prevTension < this.tension){this.isWinding = true;}
 		else{this.isWinding = false;}
 		double d0 = this.posX - this.prevPosX;
@@ -274,13 +281,16 @@ public class EntityMechanicalWorker extends EntityGolem
 	public void wind(float rate)
 	{
 		if (this.Mainspring != null){			
-			if (this.tension + rate/this.windingCost <= this.maxTension)
+			if (this.tension + rate/this.windingCost <= this.maxTension && this.windingTimer <= 10)
 			{
 				this.tension += (rate/this.windingCost);
-				this.windingTimer = 5;
+				this.windingTimer = 20;
+				this.playSound(ModSoundEvents.WORKER_WIND, this.getSoundVolume(), this.getSoundPitch());
 			}
-			if (world.isRemote){System.out.println("Client: " + this.tension);}
-			else{System.out.println("Server: " + this.tension);}
+			else if (this.windingTimer <= 5)
+			{
+				this.playSound(ModSoundEvents.WORKER_WIND_END, this.getSoundVolume(), this.getSoundPitch());
+			}
 		}
 	}
 	public void unwind(float amount)
@@ -309,7 +319,11 @@ public class EntityMechanicalWorker extends EntityGolem
 	@Override
 	public boolean isEntityInvulnerable(DamageSource source)
     {
-        return source == DamageSource.IN_WALL || source == DamageSource.ON_FIRE || source == DamageSource.CACTUS ||  source.isMagicDamage();
+        return source == DamageSource.IN_WALL 
+        		|| source == DamageSource.ON_FIRE 
+        		|| source == DamageSource.CACTUS 
+        		|| source.isMagicDamage()
+        		|| source == DamageSource.DROWN;
     }
 	
 	public void onDeath(DamageSource cause)

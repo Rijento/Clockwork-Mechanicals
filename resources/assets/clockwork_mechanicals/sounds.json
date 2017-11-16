@@ -1,0 +1,31 @@
+{
+    "entity.mechanical_worker.tick":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "clockwork_mechanicals:entity/mechanical_worker/worker_tick_00",
+            "clockwork_mechanicals:entity/mechanical_worker/worker_tick_01",
+            "clockwork_mechanicals:entity/mechanical_worker/worker_tick_02",
+            "clockwork_mechanicals:entity/mechanical_worker/worker_tick_03",
+            "clockwork_mechanicals:entity/mechanical_worker/worker_tick_04",
+            "clockwork_mechanicals:entity/mechanical_worker/worker_tick_05"
+        ]
+    },
+    "entity.mechanical_worker.wind":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "clockwork_mechanicals:entity/mechanical_worker/wind"
+        ]
+    },
+    "entity.mechanical_worker.wind_end":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "clockwork_mechanicals:entity/mechanical_worker/wind_end"
+        ]
+    }
+}

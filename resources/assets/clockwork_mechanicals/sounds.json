@@ -27,5 +27,13 @@
         [
             "clockwork_mechanicals:entity/mechanical_worker/wind_end"
         ]
+    },
+    "entity.mechanical_worker.install_mainspring":
+    {
+        "category": "neutral",
+        "sounds":
+        [
+            "clockwork_mechanicals:entity/mechanical_worker/worker_mainspring_install"
+        ]
     }
 }

@@ -132,6 +132,7 @@ public class EntityMechanicalWorker extends EntityGolem
 		this.maxTension = ItemMainspring.getMaxTension(MainspringIn.getItemDamage());
 		this.windingCost = ItemMainspring.getWindingCost(MainspringIn.getItemDamage());
 		this.setAIMoveSpeed(0.25F * ItemMainspring.getResistance(MainspringIn.getItemDamage()));
+		this.playSound(ModSoundEvents.WORKER_MAINSPRING_INSTALL, this.getSoundVolume(), this.getSoundPitch());
 	}
 	
 	public void SetOrders(List<Order> ordersIn, boolean load)

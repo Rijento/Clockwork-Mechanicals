@@ -17,6 +17,8 @@ public class ModSoundEvents
 	public static final SoundEvent WORKER_WIND = createSoundEvent("entity.mechanical_worker.wind");
 	@ObjectHolder("entity.mechanical_worker.wind_end")
 	public static final SoundEvent WORKER_WIND_END = createSoundEvent("entity.mechanical_worker.wind_end");
+	@ObjectHolder("entity.mechanical_worker.install_mainspring")
+	public static final SoundEvent WORKER_MAINSPRING_INSTALL = createSoundEvent("entity.mechanical_worker.install_mainspring");
 	
 	
 	private static SoundEvent createSoundEvent(String name)
@@ -34,7 +36,8 @@ public class ModSoundEvents
 			event.getRegistry().registerAll(
 					WORKER_TICK,
 					WORKER_WIND,
-					WORKER_WIND_END
+					WORKER_WIND_END,
+					WORKER_MAINSPRING_INSTALL
 					);
 		}
 	}

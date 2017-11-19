@@ -37,6 +37,13 @@ public class PathNavigateMechanical extends PathNavigate {
     {
         return 200f;
     }
+    
+    @Override
+    public void onUpdateNavigation()
+    {
+    	if (this.entity.isWet()) {this.clearPath();}
+    	super.onUpdateNavigation();
+    }
     /**
      * If on ground or swimming and can swim
      */

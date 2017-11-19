@@ -1,13 +1,10 @@
 {
-  "type": "forge:ore_shapeless",
+  "type": "wildcard_shapeless",
   "ingredients": [
-    [
-        {"item": "#MOLD_TEMPLATE"},
-        {
-            "item":"clockwork_mechanicals:mold_template",
-            "data": 1
-        }
-    ],
+    {
+        "item":"clockwork_mechanicals:mold_template",
+        "data":32767
+    },
     {
         "item": "minecraft:clay_ball"
     }

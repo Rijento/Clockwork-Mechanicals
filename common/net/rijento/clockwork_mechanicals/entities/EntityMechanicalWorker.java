@@ -35,113 +35,31 @@ import net.rijento.clockwork_mechanicals.init.ModSoundEvents;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.lib.Order;
 
-public class EntityMechanicalWorker extends EntityGolem 
+public class EntityMechanicalWorker extends EntityMechanicalBase
 {
-	public List<Order> orders;
-	public boolean isWinding = false;
-	private ItemStack Mainspring;
-	private int currentTask;
-	private final InventoryBasic workerInventory;
-	private float prevTension;
-	private float tension;
-	private float maxTension;
-	private float moveSpeed;
-	private float windingCost;
-	private int windingTimer;
-	
-	public EntityMechanicalWorker(World worldIn) {
-		super(worldIn);
-		this.workerInventory = new InventoryBasic("Items", false, 9);
-		this.setSize(0.6F, 0.95F);
-		this.maxTension = 0F;
-		this.navigator = new PathNavigateMechanical(this, worldIn);
-		this.setCanPickUpLoot(true);
-	}
-	protected boolean isAIEnabled()
-	{
-	   return true;
-	}
-	@Override
-	public float getAIMoveSpeed()
-    {
-		if (this.Mainspring != null)
-		{
-			return 0.25F * ItemMainspring.getResistance(this.Mainspring.getItemDamage());
-		}
-		else{return 0.0f;}
-    }
-	
-	@Override
-	public void onUpdate()
-	{
-		if (this.ticksExisted % 20 == 0 
-				&& this.hasMainspring() 
-				&& this.tension > 1.0F 
-				&& !this.isWinding
-				&& !this.isWet()) 
-			{this.playSound(ModSoundEvents.WORKER_TICK, this.getSoundVolume() / 3F,1.0F);}
-		if (this.prevTension < this.tension){this.isWinding = true;}
-		else{this.isWinding = false;}
-		double d0 = this.posX - this.prevPosX;
-        double d1 = this.posZ - this.prevPosZ;
-        double f1 = d0 * d0 + d1 * d1;
-        float distance = (float)Math.sqrt(f1);
-        if (distance > 0.0F){this.unwind(0.25F * distance);}
-		super.onUpdate();
-		if (this.windingTimer <= 0)
-		{
-			this.prevTension = this.tension;
-		}
-		else{this.windingTimer--;}
-	}
-	
-	protected void updateEquipmentIfNeeded(EntityItem itemEntity)
-    {
-        ItemStack itemstack = itemEntity.getItem();
-        ItemStack itemstack1 = this.workerInventory.addItem(itemstack);
 
-        if (itemstack1.isEmpty())
-        {
-            itemEntity.setDead();
-        }
-        else
-        {
-            itemstack.setCount(itemstack1.getCount());
-        }
-    
-    }
-	public boolean hasMainspring()
+	public EntityMechanicalWorker(World worldIn)
 	{
-		return this.Mainspring != null;
+		super(worldIn, new InventoryBasic("Items", false, 9), 0.6F, 0.95F, 0.25F);
+		this.setTickingSound(ModSoundEvents.WORKER_TICK);
+		this.setWindingSound(ModSoundEvents.WORKER_WIND);
+		this.setWindingEndSound(ModSoundEvents.WORKER_WIND_END);
+		this.setMainspringInstallSound(ModSoundEvents.WORKER_MAINSPRING_INSTALL);
 	}
-	
-	public ItemStack getMainspring()
+	@Override
+	protected float getSoundVolume()
 	{
-		return this.Mainspring;
+		return super.getSoundVolume() / 3.0F;
 	}
-	
-	public void setMainspring(ItemStack MainspringIn)
-	{
-		if (this.Mainspring != null && !this.world.isRemote)
-		{
-			this.entityDropItem(this.Mainspring, 0.5F);
-		}
-		this.Mainspring = MainspringIn;
-		this.tension = 0F;
-		this.prevTension = 0F;
-		this.maxTension = ItemMainspring.getMaxTension(MainspringIn.getItemDamage());
-		this.windingCost = ItemMainspring.getWindingCost(MainspringIn.getItemDamage());
-		this.setAIMoveSpeed(0.25F * ItemMainspring.getResistance(MainspringIn.getItemDamage()));
-		this.playSound(ModSoundEvents.WORKER_MAINSPRING_INSTALL, this.getSoundVolume(), this.getSoundPitch());
-	}
-	
-	public void SetOrders(List<Order> ordersIn, boolean load)
+
+	@Override
+	public void setOrders(List<Order> ordersIn, boolean load)
 	{
 		if (load == false)
-		{
-			this.tasks.taskEntries.clear();
-			this.currentTask = 0;
-		}
+			{
+				this.tasks.taskEntries.clear();
+				this.setCurrentTask(0);
+			}
 		this.orders = ordersIn;
 		for (int i = 0; i < this.orders.size(); i++)
 		{
@@ -184,156 +102,9 @@ public class EntityMechanicalWorker extends EntityGolem
 			}
 		}
 	}
-	public int getCurrentTask(){return this.currentTask;}
-	
-	public void nextTask()
-	{
-		this.currentTask = this.currentTask+1;
-		if (this.currentTask > this.orders.size() - 1)
-		{
-			this.currentTask = 0;
-		}
-	}
-	
 	public static void registerFixesWorker(DataFixer fixer)
     {
         EntityLiving.registerFixesMob(fixer, EntityMechanicalWorker.class);
         fixer.registerWalker(FixTypes.ENTITY, new ItemStackDataLists(EntityMechanicalWorker.class, new String[] {"Inventory"}));
     }
-	
-	 @Override
-	 public void writeEntityToNBT(NBTTagCompound compound)
-    {
-        super.writeEntityToNBT(compound);
-        if (this.Mainspring != null){compound.setTag("Mainspring", this.Mainspring.writeToNBT(new NBTTagCompound()));}
-        else {compound.setTag("Mainspring", (new ItemStack(Items.AIR)).writeToNBT(new NBTTagCompound()));}
-        compound.setFloat("Tension", this.tension);
-        compound.setInteger("currentTask", this.currentTask);
-        
-        
-        NBTTagList nbttaglist = new NBTTagList();
-
-        for (int i = 0; i < this.workerInventory.getSizeInventory(); ++i)
-        {
-            ItemStack itemstack = this.workerInventory.getStackInSlot(i);
-
-            if (!itemstack.isEmpty())
-            {
-                nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
-            }
-        }
-        compound.setTag("Inventory", nbttaglist);
-        
-        NBTTagList nbttaglist2 = new NBTTagList();
-        for (Order order : this.orders)
-        {
-        	nbttaglist2.appendTag(order.getOrderNBT());
-        }
-        compound.setTag("Orders", nbttaglist2);
-        
-    }
-
-	@Override
-	public void readEntityFromNBT(NBTTagCompound compound)
-	{
-		super.readEntityFromNBT(compound);
-        ItemStack MainIn = new ItemStack(compound.getCompoundTag("Mainspring"));
-        if (MainIn.getItem() instanceof ItemMainspring)
-        {
-        	this.setMainspring(MainIn);
-        }
-        this.tension = compound.getFloat("Tension");
-        this.prevTension = this.tension;
-        this.currentTask = compound.getInteger("currentTask");
-        
-        NBTTagList nbttaglist = compound.getTagList("Inventory", Constants.NBT.TAG_COMPOUND);
-
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
-        {
-            ItemStack itemstack = new ItemStack(nbttaglist.getCompoundTagAt(i));
-
-            if (!itemstack.isEmpty())
-            {
-                this.workerInventory.addItem(itemstack);
-            }
-        }
-        NBTTagList nbttaglist2 = compound.getTagList("Orders", Constants.NBT.TAG_COMPOUND);
-        this.orders = new ArrayList<Order>();
-        for (int i = 0; i < nbttaglist2.tagCount(); ++i)
-        {
-        	Order toAdd = new Order(nbttaglist2.getCompoundTagAt(i));
-        	this.orders.add(toAdd);
-        }
-        this.SetOrders(this.orders, true);
-    }
-	
-    @Nullable
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata)
-    {
-		this.tension = 0F;
-    	return this.finalizeMobSpawn(difficulty, livingdata, true);
-    }
-
-    public IEntityLivingData finalizeMobSpawn(DifficultyInstance p_190672_1_, @Nullable IEntityLivingData p_190672_2_, boolean p_190672_3_)
-    {
-        p_190672_2_ = super.onInitialSpawn(p_190672_1_, p_190672_2_);
-        return p_190672_2_;
-    }
-	public void wind(float rate)
-	{
-		if (this.Mainspring != null){			
-			if (this.tension + rate/this.windingCost <= this.maxTension && this.windingTimer <= 10)
-			{
-				this.tension += (rate/this.windingCost);
-				this.windingTimer = 20;
-				this.playSound(ModSoundEvents.WORKER_WIND, this.getSoundVolume(), this.getSoundPitch());
-			}
-			else if (this.windingTimer <= 5)
-			{
-				this.playSound(ModSoundEvents.WORKER_WIND_END, this.getSoundVolume(), this.getSoundPitch());
-			}
-		}
-	}
-	public void unwind(float amount)
-	{
-		if (this.tension - amount >= 0)
-		{
-			this.tension -= amount;
-		}
-	}
-	public float getTension()
-	{
-		return this.tension;
-	}
-	
-	public InventoryBasic getMechanicalInventory()
-	{
-		return this.workerInventory;
-	}
-	public void overrideMechanicalInventory(InventoryBasic inventoryIn)
-	{
-		for (int i = 0; i < inventoryIn.getSizeInventory(); i++)
-		{
-			this.workerInventory.setInventorySlotContents(i, inventoryIn.getStackInSlot(i));
-		}
-	}
-	@Override
-	public boolean isEntityInvulnerable(DamageSource source)
-    {
-        return source == DamageSource.IN_WALL 
-        		|| source == DamageSource.ON_FIRE 
-        		|| source == DamageSource.CACTUS 
-        		|| source.isMagicDamage()
-        		|| source == DamageSource.DROWN;
-    }
-	
-	public void onDeath(DamageSource cause)
-	{
-		super.onDeath(cause);
-		InventoryHelper.dropInventoryItems(this.world, this.getPosition(), this.workerInventory);
-		if (!this.world.isRemote && this.Mainspring != null)
-		{
-			this.entityDropItem(this.Mainspring, 0.5F);
-		}
-	}
 }

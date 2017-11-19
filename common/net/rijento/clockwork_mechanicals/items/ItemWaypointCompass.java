@@ -28,7 +28,8 @@ import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
 public class ItemWaypointCompass extends Item
 {
 	public ItemWaypointCompass()
-	{
+	{ 
+		//Below is an edited snippet of code from the ItemCompass from minecraft
 		this.addPropertyOverride(new ResourceLocation("waypointangle"), new IItemPropertyGetter()
         {
             @SideOnly(Side.CLIENT)
@@ -102,6 +103,7 @@ public class ItemWaypointCompass extends Item
                 return Math.atan2((double)pos.getZ() - player.posZ, (double)pos.getX() - player.posX);
             }
         });
+		//above is an edited snippet of code from the ItemCompass from minecraft
     }
 	@Override
 	@SideOnly(Side.CLIENT)

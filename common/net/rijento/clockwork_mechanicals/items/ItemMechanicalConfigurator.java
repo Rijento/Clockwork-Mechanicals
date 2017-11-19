@@ -59,7 +59,7 @@ public class ItemMechanicalConfigurator extends Item
 	{
 		if (entity instanceof EntityMechanicalWorker && player.isSneaking())
 		{
-			((EntityMechanicalWorker) entity).SetOrders(getOrders(itemstack),false);
+			((EntityMechanicalWorker) entity).setOrders(getOrders(itemstack),false);
 			return true;
 		}
 		return false;

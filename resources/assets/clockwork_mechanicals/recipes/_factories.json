@@ -1,0 +1,6 @@
+{
+    "recipes":
+    {
+        "wildcard_shapeless": "net.rijento.clockwork_mechanicals.lib.ShapelessWildcardRecipe$Factory"
+    }
+}

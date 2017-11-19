@@ -9,19 +9,19 @@ public class ItemMoldTemplate extends Item
 {
 	public ItemMoldTemplate()
 	{
-//		this.setMaxStackSize(1);
-//	    this.setMaxDamage(100);
-//	    this.setNoRepair();
+		this.setMaxStackSize(1);
+	    this.setMaxDamage(100);
+	    this.setNoRepair();
 	}
-//	@Override
-//    public ItemStack getContainerItem(ItemStack itemstack){
-//        ItemStack stack = itemstack.copy();
-//        stack.attemptDamageItem(1, itemRand, null);
-//        return stack;
-//    }
-//
-//    @Override
-//    public boolean hasContainerItem(ItemStack stack){
-//        return true;
-//    }
+	@Override
+    public ItemStack getContainerItem(ItemStack itemstack){
+        ItemStack stack = itemstack.copy();
+        stack.attemptDamageItem(1, itemRand, null);
+        return stack;
+    }
+
+    @Override
+    public boolean hasContainerItem(ItemStack stack){
+        return true;
+    }
 }

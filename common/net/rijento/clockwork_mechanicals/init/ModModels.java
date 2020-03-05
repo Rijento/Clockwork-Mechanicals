@@ -48,8 +48,8 @@ public class ModModels
 		registerItemModel(ModItems.zinc_ingot, 0, "zinc_ingot");
 		registerItemModel(ModItems.copper_ingot, 0, "copper_ingot");
 		
-		registerItemModel(ModItems.mold_template, 0, "mold_template");
-		registerItemModel(ModItems.blank_mold, 0, "mold/blank_mold");
+//		registerItemModel(ModItems.mold_template, 0, "mold_template");
+//		registerItemModel(ModItems.blank_mold, 0, "mold/blank_mold");
 		
 		registerItemModel(ModItems.small_gear, 0, "small_gear");
 		registerItemModel(ModItems.small_plate, 0, "small_plate");

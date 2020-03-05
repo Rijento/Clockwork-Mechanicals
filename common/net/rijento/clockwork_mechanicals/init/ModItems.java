@@ -1,18 +1,10 @@
 package net.rijento.clockwork_mechanicals.init;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -21,7 +13,6 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.rijento.clockwork_mechanicals.ClockworkMechanicals;
 import net.rijento.clockwork_mechanicals.items.ItemMainspring;
 import net.rijento.clockwork_mechanicals.items.ItemMechanicalConfigurator;
-import net.rijento.clockwork_mechanicals.items.ItemMoldTemplate;
 import net.rijento.clockwork_mechanicals.items.ItemWaypointCompass;
 import net.rijento.clockwork_mechanicals.items.ItemWindingKey;
 
@@ -37,8 +28,8 @@ public class ModItems
 	public static final Item brass_ingot = new Item();
 	public static final Item zinc_ingot = new Item();
 	public static final Item copper_ingot = new Item();
-	public static final ItemMoldTemplate mold_template = new ItemMoldTemplate();
-	public static final Item blank_mold = new Item();
+//	public static final ItemMoldTemplate mold_template = new ItemMoldTemplate();
+//	public static final Item blank_mold = new Item();
 	public static final Item small_gear = new Item();
 	public static final Item small_plate = new Item();
 	//public static final ItemBlock stamping_table = new ItemBlock(ModBlocks.stamping_table);
@@ -52,8 +43,9 @@ public class ModItems
 		setupItem("brass_ingot", brass_ingot);
 		setupItem("zinc_ingot", zinc_ingot);
 		setupItem("copper_ingot", copper_ingot);
-		setupItem("mold_template", mold_template);
-		setupItem("blank_mold", blank_mold);
+//		Deprecated, no longer used
+//		setupItem("mold_template", mold_template);
+//		setupItem("blank_mold", blank_mold);
 		
 		setupItem("gear_small", small_gear);
 		setupItem("plate_small", small_plate);
@@ -93,8 +85,8 @@ public class ModItems
 					brass_ingot,
 					zinc_ingot,
 					copper_ingot,
-					mold_template,
-					blank_mold,
+//					mold_template,
+//					blank_mold,
 					small_gear,
 					small_plate
 //					stamping_table

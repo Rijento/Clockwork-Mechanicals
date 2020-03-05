@@ -105,7 +105,7 @@ public class EntityAIMechanicalDropOff extends EntityAIBase
 			int size = this.theMechanical.getMechanicalInventory().getSizeInventory();
 			for (int i = 0; i < size; ++i)
             {
-                if (!mechainicalInventory.getStackInSlot(i).isEmpty() && this.runtime % this.transferTime == 0)
+                if (!mechainicalInventory.getStackInSlot(i).isEmpty() && this.runtime % this.transferTime == 0 && this.runtime != 0)
                 {
                     ItemStack itemstack = mechainicalInventory.getStackInSlot(i);
                     Item item = mechainicalInventory.getStackInSlot(i).getItem();
